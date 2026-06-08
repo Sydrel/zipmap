@@ -15,28 +15,32 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
         body {
             font-family: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
             background: #eef2f7;
             color: #1a2c3e;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        /* HEADER SIMPLIFICADO - sin texto extra */
+        /* HEADER - compacto, sin margen extra inferior */
         .header {
             background: linear-gradient(135deg, #0b3b2f, #1a5c6e);
             color: white;
-            padding: 0.7rem 1rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            position: sticky;
-            top: 0;
-            z-index: 10;
+            padding: 0.5rem 1rem 0.5rem 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            flex-shrink: 0;
         }
 
         .header h1 {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 700;
             display: flex;
             align-items: center;
@@ -47,21 +51,20 @@
 
         .mode-switch {
             display: flex;
-            gap: 10px;
-            margin-top: 6px;
+            gap: 8px;
+            margin-top: 4px;
             flex-wrap: wrap;
         }
 
         .mode-btn {
             background: rgba(255,255,240,0.2);
             border: 1px solid rgba(255,255,255,0.4);
-            padding: 0.25rem 0.9rem;
+            padding: 0.2rem 0.8rem;
             border-radius: 40px;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             cursor: pointer;
             transition: all 0.2s;
             font-weight: 500;
-            backdrop-filter: blur(4px);
         }
 
         .mode-btn.active {
@@ -70,36 +73,35 @@
             border-color: white;
         }
 
-        /* CONTENEDOR PRINCIPAL: SIDE BY SIDE POR DEFECTO */
+        /* CONTENEDOR PRINCIPAL - ocupa todo el espacio restante sin scroll global */
         .main-container {
             display: flex;
             flex-direction: row;
             gap: 0.8rem;
-            margin: 0.8rem;
+            padding: 0.8rem;
             flex: 1;
             min-height: 0;
+            overflow: hidden;
         }
 
-        /* MAPA */
+        /* MAPA - con margen interno para no tocar bordes */
         .map-wrapper {
             flex: 1;
             min-width: 0;
             border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             border: 2px solid white;
             background: #cbdae5;
-            position: relative;
         }
 
         #map {
             width: 100%;
             height: 100%;
-            min-height: 400px;
             background: #cbdae5;
         }
 
-        /* PANEL DE RESULTADOS */
+        /* PANEL DE RESULTADOS - con scroll interno */
         .results-panel {
             flex: 1;
             min-width: 0;
@@ -107,28 +109,27 @@
             flex-direction: column;
             background: white;
             border-radius: 20px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             border: 2px solid white;
             overflow: hidden;
         }
 
         .info-card {
             background: white;
-            padding: 0.8rem;
+            padding: 0.7rem;
             display: flex;
             flex-direction: column;
             height: 100%;
             overflow: hidden;
-            border-radius: 20px;
         }
 
         .info-card h3 {
             display: flex;
             align-items: center;
             gap: 6px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #1e5f55;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             flex-wrap: wrap;
             justify-content: space-between;
             flex-shrink: 0;
@@ -136,12 +137,13 @@
 
         #selectedLocationName {
             font-weight: 600;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: #c4450c;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             flex-shrink: 0;
         }
 
+        /* Scroll interno solo en la lista de ZIPs */
         #zipCodeList {
             flex: 1;
             overflow-y: auto;
@@ -151,25 +153,25 @@
         }
 
         .city-zip-section {
-            margin-bottom: 1rem;
+            margin-bottom: 0.8rem;
             border-bottom: 1px solid #e2e8f0;
-            padding-bottom: 0.7rem;
+            padding-bottom: 0.6rem;
         }
 
         .city-header {
             font-weight: 800;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: #c4450c;
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 6px;
+            gap: 6px;
+            margin-bottom: 5px;
             flex-wrap: wrap;
         }
 
         .city-color-dot {
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
             display: inline-block;
             flex-shrink: 0;
@@ -178,54 +180,53 @@
         .zip-grid {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.4rem;
-            margin-top: 4px;
-            margin-left: 0.2rem;
+            gap: 0.35rem;
+            margin-top: 3px;
+            margin-left: 0.1rem;
         }
 
         .zip-badge {
-            padding: 0.35rem 0.8rem;
+            padding: 0.3rem 0.7rem;
             border-radius: 40px;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 600;
             font-family: monospace;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
             border: 1px solid rgba(0,0,0,0.08);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
             touch-action: manipulation;
         }
 
         .zip-badge:active {
-            transform: scale(0.96);
+            transform: scale(0.95);
         }
 
         .instruction {
             background: #fef9e6;
-            border-radius: 18px;
-            padding: 0.6rem 1rem;
-            margin-top: 0.8rem;
-            font-size: 0.65rem;
+            border-radius: 16px;
+            padding: 0.5rem 0.8rem;
+            margin-top: 0.6rem;
+            font-size: 0.6rem;
             text-align: center;
         }
 
         .drive-instruction {
             background: #e0f2fe;
-            border-radius: 14px;
-            padding: 5px 8px;
-            font-size: 0.6rem;
-            margin-top: 8px;
+            border-radius: 12px;
+            padding: 4px 8px;
+            font-size: 0.55rem;
+            margin-top: 6px;
             text-align: center;
             flex-shrink: 0;
         }
 
         footer {
             text-align: center;
-            padding: 0.6rem;
-            font-size: 0.6rem;
+            padding: 0.3rem;
+            font-size: 0.55rem;
             background: #dce5ec;
             color: #2c5a6e;
-            margin-top: 0.3rem;
+            flex-shrink: 0;
         }
 
         #zipCodeList::-webkit-scrollbar {
@@ -252,79 +253,59 @@
             background: #cbdae5;
         }
 
-        /* ========== RESPONSIVE: MÓVIL, TABLET, ESCRITORIO ========== */
+        /* ========== RESPONSIVE ========== */
         
-        /* ESCRITORIO GRANDE (≥1200px) */
+        /* ESCRITORIO GRANDE */
         @media (min-width: 1200px) {
-            .main-container {
-                margin: 1rem 1.5rem;
-                gap: 1.2rem;
-            }
-            .header h1 { font-size: 1.3rem; }
-            .city-header { font-size: 0.95rem; }
-            .zip-badge { padding: 0.4rem 1rem; font-size: 0.75rem; }
-            #map { min-height: 500px; }
+            .main-container { gap: 1rem; padding: 1rem; }
+            .header h1 { font-size: 1.2rem; }
+            .city-header { font-size: 0.9rem; }
+            .zip-badge { padding: 0.35rem 0.9rem; font-size: 0.7rem; }
+            .drive-instruction { font-size: 0.6rem; }
         }
 
-        /* ESCRITORIO / TABLET GRANDE (769px - 1199px) - SIDE BY SIDE */
+        /* TABLET / ESCRITORIO MEDIANO */
         @media (min-width: 769px) and (max-width: 1199px) {
-            .main-container {
-                flex-direction: row;
-                margin: 0.8rem;
-                gap: 0.8rem;
-            }
-            .map-wrapper { flex: 1; }
-            .results-panel { flex: 1; }
-            #map { min-height: 450px; }
-            .city-header { font-size: 0.8rem; }
-            .zip-badge { padding: 0.35rem 0.8rem; font-size: 0.7rem; }
+            .main-container { gap: 0.7rem; padding: 0.7rem; }
+            .city-header { font-size: 0.75rem; }
+            .zip-badge { padding: 0.3rem 0.7rem; font-size: 0.65rem; }
         }
 
-        /* TABLET / iPAD (600px - 768px) - SIDE BY SIDE pero más compacto */
+        /* TABLET PEQUEÑA / iPAD (600px - 768px) - SIDE BY SIDE */
         @media (min-width: 600px) and (max-width: 768px) {
-            .main-container {
-                flex-direction: row;
-                margin: 0.6rem;
-                gap: 0.6rem;
-            }
-            .map-wrapper { flex: 1; }
-            .results-panel { flex: 1; }
-            #map { min-height: 350px; }
+            .main-container { gap: 0.6rem; padding: 0.6rem; }
             .city-header { font-size: 0.7rem; }
-            .zip-badge { padding: 0.3rem 0.6rem; font-size: 0.65rem; }
-            .info-card h3 { font-size: 0.8rem; }
-            .drive-instruction { font-size: 0.55rem; }
+            .zip-badge { padding: 0.25rem 0.6rem; font-size: 0.6rem; }
+            .info-card h3 { font-size: 0.75rem; }
+            .drive-instruction { font-size: 0.5rem; }
+            .header h1 { font-size: 0.95rem; }
         }
 
-        /* MÓVIL (≤599px) - SE APILA VERTICALMENTE */
+        /* MÓVIL - SE APILA VERTICALMENTE */
         @media (max-width: 599px) {
             .main-container {
                 flex-direction: column;
-                margin: 0.6rem;
-                gap: 0.6rem;
+                gap: 0.5rem;
+                padding: 0.5rem;
             }
             .map-wrapper {
-                min-height: 280px;
-            }
-            #map {
-                min-height: 280px;
-                height: 38vh;
+                flex: 0 0 40%;
+                min-height: 200px;
             }
             .results-panel {
-                max-height: 45vh;
-                min-height: 300px;
+                flex: 1;
+                min-height: 0;
             }
-            .header h1 { font-size: 1rem; }
-            .city-header { font-size: 0.75rem; }
-            .zip-badge { padding: 0.3rem 0.7rem; font-size: 0.65rem; }
-            .drive-instruction { font-size: 0.55rem; }
+            .header h1 { font-size: 0.9rem; }
+            .mode-btn { padding: 0.15rem 0.6rem; font-size: 0.6rem; }
+            .city-header { font-size: 0.7rem; }
+            .zip-badge { padding: 0.25rem 0.6rem; font-size: 0.6rem; }
         }
 
-        /* MÓVIL MUY PEQUEÑO */
+        /* Móvil muy pequeño */
         @media (max-width: 380px) {
-            .zip-badge { padding: 0.25rem 0.6rem; font-size: 0.6rem; }
-            .city-header { font-size: 0.7rem; }
-            #map { min-height: 250px; }
+            .map-wrapper { flex: 0 0 35%; min-height: 180px; }
+            .zip-badge { padding: 0.2rem 0.5rem; font-size: 0.55rem; }
         }
     </style>
 </head>
@@ -332,10 +313,10 @@
 <div class="header">
     <h1>
         <span>🗺️ Códigos ZIP de Florida</span>
-        <span style="font-size:0.65rem; background:rgba(255,255,255,0.2); padding:0.2rem 0.6rem; border-radius:30px;">🚗 Navegación</span>
+        <span style="font-size:0.6rem; background:rgba(255,255,255,0.2); padding:0.15rem 0.5rem; border-radius:30px;">🚗 Navegación</span>
     </h1>
     <div class="mode-switch">
-        <div id="showAllZipsBtn" class="mode-btn active">📦 Ver TODOS los ZIP</div>
+        <div id="showAllZipsBtn" class="mode-btn active">📦 Ver todos los ZIP</div>
     </div>
 </div>
 
@@ -350,11 +331,11 @@
         <div class="info-card">
             <h3>
                 <span>📮 Códigos ZIP</span>
-                <span style="font-size:0.6rem;">🎨 Colores por área</span>
+                <span style="font-size:0.55rem;">🎨 Colores por área</span>
             </h3>
-            <div id="selectedLocationName" style="font-weight: 600; font-size: 0.7rem; color: #c4450c; margin-bottom: 4px;">✨ Toque cualquier código para navegar</div>
+            <div id="selectedLocationName" style="font-weight: 600; font-size: 0.65rem; color: #c4450c; margin-bottom: 3px;">✨ Toque cualquier código para navegar</div>
             <div id="zipCodeList">
-                <div class="instruction">⏳ Cargando todos los códigos ZIP... Toque cualquier código y el mapa lo guiará hasta ese destino.</div>
+                <div class="instruction">⏳ Cargando códigos ZIP... Toque cualquier código y el mapa navegará al destino.</div>
             </div>
             <div class="drive-instruction">
                 🚗 <strong>Toque cualquier código ZIP</strong> → El mapa navega al destino | Naranja(352) · Azul(904) · Verde(321) · Rojo(772) · Morado(561/772)
@@ -364,7 +345,7 @@
 </div>
 
 <footer>
-    🗺️ OpenStreetMap | Ocala · Jacksonville · Melbourne · Cocoa Beach · Palm Bay · Vero Beach · Fort Pierce · Port St. Lucie · Stuart · Hobe Sound
+    🗺️ Ocala · Jacksonville · Melbourne · Cocoa Beach · Palm Bay · Vero Beach · Fort Pierce · Port St. Lucie · Stuart · Hobe Sound
 </footer>
 
 <script>
@@ -373,15 +354,17 @@
         const map = L.map('map').setView([28.2, -81.4], 7.5);
         
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
             maxZoom: 18,
             minZoom: 6
         }).addTo(map);
         
         L.control.scale({ metric: true, imperial: true, position: 'bottomleft' }).addTo(map);
         
-        // Forzar redimensionamiento correcto
-        const resizeMap = () => setTimeout(() => map.invalidateSize(), 100);
+        // Función para redimensionar correctamente el mapa
+        const resizeMap = () => {
+            setTimeout(() => map.invalidateSize(), 50);
+        };
         resizeMap();
         window.addEventListener('resize', resizeMap);
         window.addEventListener('orientationchange', resizeMap);
@@ -504,26 +487,26 @@
         let currentDriveMarker = null;
 
         function navegarAZip(zipCode, lat, lng, color) {
-            map.flyTo([lat, lng], 13, { duration: 0.9, animate: true });
+            map.flyTo([lat, lng], 13, { duration: 0.8 });
             
             if (currentDriveMarker) map.removeLayer(currentDriveMarker);
             
             const destinoIcon = L.divIcon({
                 className: 'custom-marker',
-                html: `<div style="background-color: ${color}; width: 42px; height: 42px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 0 0 3px rgba(243,156,18,0.6); font-weight: bold; font-size: 8px; color: white; text-align: center; line-height: 1.1;">🚗<br>${zipCode}</div>`,
-                iconSize: [42, 42],
-                popupAnchor: [0, -20]
+                html: `<div style="background-color: ${color}; width: 40px; height: 40px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 0 0 3px rgba(243,156,18,0.6); font-weight: bold; font-size: 8px; color: white; text-align: center; line-height: 1;">🚗<br>${zipCode}</div>`,
+                iconSize: [40, 40],
+                popupAnchor: [0, -18]
             });
             
             currentDriveMarker = L.marker([lat, lng], { icon: destinoIcon }).addTo(map);
-            currentDriveMarker.bindPopup(`<b>📍 Destino: ${zipCode}</b>`).openPopup();
+            currentDriveMarker.bindPopup(`<b>📍 ${zipCode}</b>`).openPopup();
             
             setTimeout(() => {
                 if (currentDriveMarker) {
                     currentDriveMarker.closePopup();
-                    setTimeout(() => { if(currentDriveMarker) map.removeLayer(currentDriveMarker); currentDriveMarker = null; }, 800);
+                    setTimeout(() => { if(currentDriveMarker) map.removeLayer(currentDriveMarker); currentDriveMarker = null; }, 500);
                 }
-            }, 4000);
+            }, 3500);
         }
 
         function renderizarTodosPorCiudad() {
@@ -543,8 +526,8 @@
                 header.className = "city-header";
                 header.innerHTML = `
                     <span class="city-color-dot" style="background-color: ${ciudad.color};"></span>
-                    <span>🏙️ ${ciudad.nombre} <span style="font-size:0.6rem; background:#eef2f7; padding:0.1rem 0.4rem; border-radius:30px;">${ciudad.areaCode}</span></span>
-                    <span style="font-size:0.6rem; color:#5a6e7c;">(${zipsOrdenados.length})</span>
+                    <span>🏙️ ${ciudad.nombre} <span style="font-size:0.55rem; background:#eef2f7; padding:0.1rem 0.4rem; border-radius:30px;">${ciudad.areaCode}</span></span>
+                    <span style="font-size:0.55rem; color:#5a6e7c;">(${zipsOrdenados.length})</span>
                 `;
                 section.appendChild(header);
                 
@@ -570,7 +553,6 @@
             const totalZips = ciudades.reduce((sum, c) => sum + c.zips.length, 0);
             const totalMsg = document.createElement("div");
             totalMsg.className = "instruction";
-            totalMsg.style.marginTop = "0.6rem";
             totalMsg.innerHTML = `✅ ${totalZips} códigos ZIP en ${ciudades.length} ciudades. Toque cualquier código → mapa navega al destino.`;
             mainDiv.appendChild(totalMsg);
         }
@@ -588,8 +570,8 @@
             if (!coords) return;
             
             const ciudadIcon = L.divIcon({
-                html: `<div style="background-color: ${ciudad.color}; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2.5px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3); font-weight: bold; font-size: 9px; color: white;">${ciudad.nombre.substring(0,2)}</div>`,
-                iconSize: [32, 32],
+                html: `<div style="background-color: ${ciudad.color}; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3); font-weight: bold; font-size: 8px; color: white;">${ciudad.nombre.substring(0,2)}</div>`,
+                iconSize: [30, 30],
                 popupAnchor: [0, -12]
             });
             
@@ -603,7 +585,7 @@
                     if (secciones[i].innerText.includes(ciudad.nombre)) {
                         secciones[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
                         secciones[i].style.background = "#fff0db";
-                        setTimeout(() => { secciones[i].style.background = ""; }, 1000);
+                        setTimeout(() => { secciones[i].style.background = ""; }, 800);
                         break;
                     }
                 }
@@ -617,8 +599,7 @@
             document.getElementById("showAllZipsBtn").classList.add("active");
         });
         
-        setTimeout(() => map.invalidateSize(), 200);
-        setTimeout(() => map.invalidateSize(), 800);
+        resizeMap();
     })();
 </script>
 </body>
