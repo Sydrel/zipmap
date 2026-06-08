@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Explorador de Códigos ZIP de Florida | Para Conductores</title>
+    <title>Explorador de Códigos ZIP de Florida | Mapa y Resultados</title>
     <!-- Leaflet CSS + JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -24,10 +24,11 @@
             min-height: 100vh;
         }
 
+        /* HEADER SIMPLIFICADO - sin texto extra */
         .header {
             background: linear-gradient(135deg, #0b3b2f, #1a5c6e);
             color: white;
-            padding: 0.9rem 1rem;
+            padding: 0.7rem 1rem;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             position: sticky;
             top: 0;
@@ -35,31 +36,26 @@
         }
 
         .header h1 {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: space-between;
             flex-wrap: wrap;
-        }
-
-        .header p {
-            font-size: 0.75rem;
-            opacity: 0.9;
-            margin-top: 4px;
+            gap: 8px;
         }
 
         .mode-switch {
             display: flex;
             gap: 10px;
-            margin-top: 8px;
+            margin-top: 6px;
             flex-wrap: wrap;
         }
 
         .mode-btn {
             background: rgba(255,255,240,0.2);
             border: 1px solid rgba(255,255,255,0.4);
-            padding: 0.3rem 1rem;
+            padding: 0.25rem 0.9rem;
             border-radius: 40px;
             font-size: 0.7rem;
             cursor: pointer;
@@ -74,8 +70,20 @@
             border-color: white;
         }
 
-        .map-wrapper {
+        /* CONTENEDOR PRINCIPAL: SIDE BY SIDE POR DEFECTO */
+        .main-container {
+            display: flex;
+            flex-direction: row;
+            gap: 0.8rem;
             margin: 0.8rem;
+            flex: 1;
+            min-height: 0;
+        }
+
+        /* MAPA */
+        .map-wrapper {
+            flex: 1;
+            min-width: 0;
             border-radius: 20px;
             overflow: hidden;
             box-shadow: 0 8px 20px rgba(0,0,0,0.15);
@@ -86,64 +94,82 @@
 
         #map {
             width: 100%;
-            height: 45vh;
-            min-height: 380px;
+            height: 100%;
+            min-height: 400px;
             background: #cbdae5;
         }
 
+        /* PANEL DE RESULTADOS */
         .results-panel {
-            max-width: 1400px;
-            margin: 0 auto 1rem auto;
-            padding: 0 0.8rem;
             flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border: 2px solid white;
+            overflow: hidden;
         }
 
         .info-card {
             background: white;
-            border-radius: 24px;
-            padding: 1rem;
-            box-shadow: 0 6px 14px rgba(0,0,0,0.06);
-            border-left: 5px solid #f39c12;
+            padding: 0.8rem;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 20px;
         }
 
         .info-card h3 {
             display: flex;
             align-items: center;
             gap: 6px;
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: #1e5f55;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             flex-wrap: wrap;
             justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        #selectedLocationName {
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: #c4450c;
+            margin-bottom: 6px;
+            flex-shrink: 0;
         }
 
         #zipCodeList {
-            max-height: 50vh;
+            flex: 1;
             overflow-y: auto;
-            padding-right: 4px;
+            padding-right: 6px;
             -webkit-overflow-scrolling: touch;
+            min-height: 0;
         }
 
         .city-zip-section {
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
             border-bottom: 1px solid #e2e8f0;
-            padding-bottom: 0.8rem;
+            padding-bottom: 0.7rem;
         }
 
         .city-header {
             font-weight: 800;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             color: #c4450c;
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             flex-wrap: wrap;
         }
 
         .city-color-dot {
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             display: inline-block;
             flex-shrink: 0;
@@ -152,15 +178,15 @@
         .zip-grid {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 6px;
-            margin-left: 0.25rem;
+            gap: 0.4rem;
+            margin-top: 4px;
+            margin-left: 0.2rem;
         }
 
         .zip-badge {
-            padding: 0.4rem 0.9rem;
+            padding: 0.35rem 0.8rem;
             border-radius: 40px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 600;
             font-family: monospace;
             cursor: pointer;
@@ -177,28 +203,29 @@
         .instruction {
             background: #fef9e6;
             border-radius: 18px;
-            padding: 0.7rem 1rem;
+            padding: 0.6rem 1rem;
             margin-top: 0.8rem;
-            font-size: 0.7rem;
-            text-align: center;
-        }
-
-        footer {
-            text-align: center;
-            padding: 0.8rem;
             font-size: 0.65rem;
-            background: #dce5ec;
-            color: #2c5a6e;
-            margin-top: 0.5rem;
+            text-align: center;
         }
 
         .drive-instruction {
             background: #e0f2fe;
             border-radius: 14px;
-            padding: 6px 10px;
-            font-size: 0.65rem;
-            margin-top: 10px;
+            padding: 5px 8px;
+            font-size: 0.6rem;
+            margin-top: 8px;
             text-align: center;
+            flex-shrink: 0;
+        }
+
+        footer {
+            text-align: center;
+            padding: 0.6rem;
+            font-size: 0.6rem;
+            background: #dce5ec;
+            color: #2c5a6e;
+            margin-top: 0.3rem;
         }
 
         #zipCodeList::-webkit-scrollbar {
@@ -213,25 +240,6 @@
             border-radius: 10px;
         }
 
-        @media (min-width: 768px) {
-            .header h1 { font-size: 1.6rem; }
-            .header p { font-size: 0.85rem; }
-            .mode-btn { padding: 0.4rem 1.2rem; font-size: 0.8rem; }
-            .map-wrapper { margin: 1.2rem; }
-            #map { height: 480px; }
-            .info-card { padding: 1.2rem 1.5rem; }
-            .city-header { font-size: 1.1rem; }
-            .zip-badge { padding: 0.45rem 1.1rem; font-size: 0.8rem; }
-            .results-panel { padding: 0 1.2rem; }
-        }
-
-        @media (max-width: 480px) {
-            .zip-badge { padding: 0.35rem 0.7rem; font-size: 0.7rem; }
-            .city-header { font-size: 0.85rem; }
-            .header h1 { font-size: 1.1rem; }
-            #map { min-height: 320px; }
-        }
-        
         .custom-marker {
             cursor: pointer;
             transition: transform 0.1s;
@@ -243,38 +251,120 @@
         .leaflet-container {
             background: #cbdae5;
         }
+
+        /* ========== RESPONSIVE: MÓVIL, TABLET, ESCRITORIO ========== */
+        
+        /* ESCRITORIO GRANDE (≥1200px) */
+        @media (min-width: 1200px) {
+            .main-container {
+                margin: 1rem 1.5rem;
+                gap: 1.2rem;
+            }
+            .header h1 { font-size: 1.3rem; }
+            .city-header { font-size: 0.95rem; }
+            .zip-badge { padding: 0.4rem 1rem; font-size: 0.75rem; }
+            #map { min-height: 500px; }
+        }
+
+        /* ESCRITORIO / TABLET GRANDE (769px - 1199px) - SIDE BY SIDE */
+        @media (min-width: 769px) and (max-width: 1199px) {
+            .main-container {
+                flex-direction: row;
+                margin: 0.8rem;
+                gap: 0.8rem;
+            }
+            .map-wrapper { flex: 1; }
+            .results-panel { flex: 1; }
+            #map { min-height: 450px; }
+            .city-header { font-size: 0.8rem; }
+            .zip-badge { padding: 0.35rem 0.8rem; font-size: 0.7rem; }
+        }
+
+        /* TABLET / iPAD (600px - 768px) - SIDE BY SIDE pero más compacto */
+        @media (min-width: 600px) and (max-width: 768px) {
+            .main-container {
+                flex-direction: row;
+                margin: 0.6rem;
+                gap: 0.6rem;
+            }
+            .map-wrapper { flex: 1; }
+            .results-panel { flex: 1; }
+            #map { min-height: 350px; }
+            .city-header { font-size: 0.7rem; }
+            .zip-badge { padding: 0.3rem 0.6rem; font-size: 0.65rem; }
+            .info-card h3 { font-size: 0.8rem; }
+            .drive-instruction { font-size: 0.55rem; }
+        }
+
+        /* MÓVIL (≤599px) - SE APILA VERTICALMENTE */
+        @media (max-width: 599px) {
+            .main-container {
+                flex-direction: column;
+                margin: 0.6rem;
+                gap: 0.6rem;
+            }
+            .map-wrapper {
+                min-height: 280px;
+            }
+            #map {
+                min-height: 280px;
+                height: 38vh;
+            }
+            .results-panel {
+                max-height: 45vh;
+                min-height: 300px;
+            }
+            .header h1 { font-size: 1rem; }
+            .city-header { font-size: 0.75rem; }
+            .zip-badge { padding: 0.3rem 0.7rem; font-size: 0.65rem; }
+            .drive-instruction { font-size: 0.55rem; }
+        }
+
+        /* MÓVIL MUY PEQUEÑO */
+        @media (max-width: 380px) {
+            .zip-badge { padding: 0.25rem 0.6rem; font-size: 0.6rem; }
+            .city-header { font-size: 0.7rem; }
+            #map { min-height: 250px; }
+        }
     </style>
 </head>
 <body>
 <div class="header">
-    <h1>🚗 Códigos ZIP de Florida | <span style="font-size:0.8rem;">Navegación para Conductores</span></h1>
-    <p>📍 Toque cualquier código postal → El mapa lo llevará hasta ese destino</p>
+    <h1>
+        <span>🗺️ Códigos ZIP de Florida</span>
+        <span style="font-size:0.65rem; background:rgba(255,255,255,0.2); padding:0.2rem 0.6rem; border-radius:30px;">🚗 Navegación</span>
+    </h1>
     <div class="mode-switch">
-        <div id="showAllZipsBtn" class="mode-btn active">📦 Ver TODOS los ZIP (por ciudad)</div>
+        <div id="showAllZipsBtn" class="mode-btn active">📦 Ver TODOS los ZIP</div>
     </div>
 </div>
 
-<div class="map-wrapper">
-    <div id="map"></div>
-</div>
+<div class="main-container">
+    <!-- MAPA -->
+    <div class="map-wrapper">
+        <div id="map"></div>
+    </div>
 
-<div class="results-panel">
-    <div class="info-card">
-        <h3>
-            <span>📮 Resultados de Códigos ZIP</span>
-            <span style="font-size:0.65rem;">🎨 Colores por área</span>
-        </h3>
-        <div id="selectedLocationName" style="font-weight: 600; font-size: 0.85rem; color: #c4450c; margin-bottom: 6px;">✨ Códigos ZIP por ciudad (toque cualquier código para navegar)</div>
-        <div id="zipCodeList">
-            <div class="instruction">⏳ Cargando todos los códigos ZIP... Toque cualquier código y el mapa lo guiará hasta ese destino.</div>
-        </div>
-        <div class="drive-instruction">
-            🚗 <strong>Toque cualquier código ZIP</strong> → El mapa se centrará en ese destino | Leyenda: Naranja(352), Azul(904), Verde(321), Rojo(772), Morado(561/772)
+    <!-- RESULTADOS -->
+    <div class="results-panel">
+        <div class="info-card">
+            <h3>
+                <span>📮 Códigos ZIP</span>
+                <span style="font-size:0.6rem;">🎨 Colores por área</span>
+            </h3>
+            <div id="selectedLocationName" style="font-weight: 600; font-size: 0.7rem; color: #c4450c; margin-bottom: 4px;">✨ Toque cualquier código para navegar</div>
+            <div id="zipCodeList">
+                <div class="instruction">⏳ Cargando todos los códigos ZIP... Toque cualquier código y el mapa lo guiará hasta ese destino.</div>
+            </div>
+            <div class="drive-instruction">
+                🚗 <strong>Toque cualquier código ZIP</strong> → El mapa navega al destino | Naranja(352) · Azul(904) · Verde(321) · Rojo(772) · Morado(561/772)
+            </div>
         </div>
     </div>
 </div>
+
 <footer>
-    🗺️ OpenStreetMap + Leaflet | Florida: Ocala → Jacksonville → Space Coast → Treasure Coast → Hobe Sound | Navegación para conductores
+    🗺️ OpenStreetMap | Ocala · Jacksonville · Melbourne · Cocoa Beach · Palm Bay · Vero Beach · Fort Pierce · Port St. Lucie · Stuart · Hobe Sound
 </footer>
 
 <script>
@@ -290,8 +380,11 @@
         
         L.control.scale({ metric: true, imperial: true, position: 'bottomleft' }).addTo(map);
         
-        setTimeout(() => map.invalidateSize(), 200);
-        window.addEventListener('resize', () => map.invalidateSize());
+        // Forzar redimensionamiento correcto
+        const resizeMap = () => setTimeout(() => map.invalidateSize(), 100);
+        resizeMap();
+        window.addEventListener('resize', resizeMap);
+        window.addEventListener('orientationchange', resizeMap);
 
         // ========== DATOS COMPLETOS POR CIUDAD ==========
         const ciudades = [
@@ -411,50 +504,31 @@
         let currentDriveMarker = null;
 
         function navegarAZip(zipCode, lat, lng, color) {
-            // Animación de navegación: el mapa se desplaza hacia el destino
-            map.flyTo([lat, lng], 13, {
-                duration: 1.0,
-                animate: true
-            });
+            map.flyTo([lat, lng], 13, { duration: 0.9, animate: true });
             
-            // Remover marcador anterior
-            if (currentDriveMarker) {
-                map.removeLayer(currentDriveMarker);
-            }
+            if (currentDriveMarker) map.removeLayer(currentDriveMarker);
             
-            // Icono de destino para conductores (🚗)
             const destinoIcon = L.divIcon({
                 className: 'custom-marker',
-                html: `<div style="background-color: ${color}; width: 44px; height: 44px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 0 0 3px rgba(243,156,18,0.6); font-weight: bold; font-size: 9px; color: white; text-align: center; line-height: 1.1;">🚗<br>${zipCode}</div>`,
-                iconSize: [44, 44],
-                popupAnchor: [0, -22]
+                html: `<div style="background-color: ${color}; width: 42px; height: 42px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 0 0 3px rgba(243,156,18,0.6); font-weight: bold; font-size: 8px; color: white; text-align: center; line-height: 1.1;">🚗<br>${zipCode}</div>`,
+                iconSize: [42, 42],
+                popupAnchor: [0, -20]
             });
             
             currentDriveMarker = L.marker([lat, lng], { icon: destinoIcon }).addTo(map);
-            currentDriveMarker.bindPopup(`<b>📍 Destino: Código ZIP ${zipCode}</b><br>Área de ${zipCode}<br>🚗 Ruta sugerida en el mapa`).openPopup();
+            currentDriveMarker.bindPopup(`<b>📍 Destino: ${zipCode}</b>`).openPopup();
             
-            // Auto-remover después de 4 segundos
             setTimeout(() => {
                 if (currentDriveMarker) {
                     currentDriveMarker.closePopup();
-                    setTimeout(() => {
-                        if (currentDriveMarker) map.removeLayer(currentDriveMarker);
-                        currentDriveMarker = null;
-                    }, 1000);
+                    setTimeout(() => { if(currentDriveMarker) map.removeLayer(currentDriveMarker); currentDriveMarker = null; }, 800);
                 }
-            }, 4500);
-            
-            // Notificación estilo GPS
-            const toast = document.createElement('div');
-            toast.innerText = `🚗 Navegando hacia ZIP ${zipCode}...`;
-            toast.style.cssText = 'position:fixed; bottom:15px; left:15px; background:#f39c12; color:white; padding:6px 14px; border-radius:30px; font-size:0.7rem; z-index:2000; font-weight:bold; box-shadow:0 2px 8px rgba(0,0,0,0.2); pointer-events:none;';
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 1800);
+            }, 4000);
         }
 
         function renderizarTodosPorCiudad() {
             const container = document.getElementById("zipCodeList");
-            document.getElementById("selectedLocationName").innerHTML = "🏘️ Códigos ZIP organizados por ciudad - Toque cualquier código para navegar hacia ese destino";
+            document.getElementById("selectedLocationName").innerHTML = "🏘️ Códigos ZIP por ciudad - Toque cualquier código para navegar";
             container.innerHTML = `<div id="ciudadesContainer"></div>`;
             const mainDiv = document.getElementById("ciudadesContainer");
             
@@ -469,8 +543,8 @@
                 header.className = "city-header";
                 header.innerHTML = `
                     <span class="city-color-dot" style="background-color: ${ciudad.color};"></span>
-                    <span>🏙️ ${ciudad.nombre} <span style="font-size:0.65rem; background:#eef2f7; padding:0.1rem 0.5rem; border-radius:30px;">${ciudad.areaCode}</span></span>
-                    <span style="font-size:0.65rem; color:#5a6e7c;">(${zipsOrdenados.length} ZIPs)</span>
+                    <span>🏙️ ${ciudad.nombre} <span style="font-size:0.6rem; background:#eef2f7; padding:0.1rem 0.4rem; border-radius:30px;">${ciudad.areaCode}</span></span>
+                    <span style="font-size:0.6rem; color:#5a6e7c;">(${zipsOrdenados.length})</span>
                 `;
                 section.appendChild(header);
                 
@@ -496,9 +570,8 @@
             const totalZips = ciudades.reduce((sum, c) => sum + c.zips.length, 0);
             const totalMsg = document.createElement("div");
             totalMsg.className = "instruction";
-            totalMsg.style.marginTop = "0.8rem";
-            totalMsg.style.background = "#e8f0fe";
-            totalMsg.innerHTML = `✅ Total: ${totalZips} códigos ZIP en ${ciudades.length} ciudades. Toque cualquier código y el mapa lo llevará hasta ese destino.`;
+            totalMsg.style.marginTop = "0.6rem";
+            totalMsg.innerHTML = `✅ ${totalZips} códigos ZIP en ${ciudades.length} ciudades. Toque cualquier código → mapa navega al destino.`;
             mainDiv.appendChild(totalMsg);
         }
         
@@ -511,39 +584,26 @@
         
         ciudades.forEach(ciudad => {
             let coords = coordsConocidas[ciudad.nombre];
-            if (!coords && ciudad.zips.length > 0) {
-                coords = [ciudad.zips[0].lat, ciudad.zips[0].lng];
-            }
+            if (!coords && ciudad.zips.length > 0) coords = [ciudad.zips[0].lat, ciudad.zips[0].lng];
             if (!coords) return;
             
             const ciudadIcon = L.divIcon({
-                html: `<div style="background-color: ${ciudad.color}; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2.5px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3); font-weight: bold; font-size: 10px; color: white;">${ciudad.nombre.substring(0,2)}</div>`,
-                iconSize: [34, 34],
-                popupAnchor: [0, -15]
+                html: `<div style="background-color: ${ciudad.color}; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2.5px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3); font-weight: bold; font-size: 9px; color: white;">${ciudad.nombre.substring(0,2)}</div>`,
+                iconSize: [32, 32],
+                popupAnchor: [0, -12]
             });
             
             const marker = L.marker(coords, { icon: ciudadIcon }).addTo(map);
-            
-            const listaZipsCorta = ciudad.zips.map(z => z.zip).slice(0, 8).join(", ") + (ciudad.zips.length > 8 ? "…" : "");
-            
-            marker.bindPopup(`
-                <div style="min-width: 150px; max-width: 220px;">
-                    <strong style="font-size:0.9rem;">🏙️ ${ciudad.nombre}</strong><br>
-                    📞 ${ciudad.areaCode}<br>
-                    📬 ZIPs: ${listaZipsCorta}<br>
-                    <span style="font-size:0.65rem;">🚗 Toque cualquier código para navegar</span>
-                </div>
-            `);
+            const listaZipsCorta = ciudad.zips.map(z => z.zip).slice(0, 6).join(", ") + (ciudad.zips.length > 6 ? "…" : "");
+            marker.bindPopup(`<b>🏙️ ${ciudad.nombre}</b><br>📞 ${ciudad.areaCode}<br>📬 ${listaZipsCorta}`);
             
             marker.on('click', () => {
-                document.querySelector('.results-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 const secciones = document.querySelectorAll('.city-zip-section');
                 for (let i = 0; i < secciones.length; i++) {
                     if (secciones[i].innerText.includes(ciudad.nombre)) {
                         secciones[i].scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        secciones[i].style.transition = "background 0.2s";
                         secciones[i].style.background = "#fff0db";
-                        setTimeout(() => { secciones[i].style.background = ""; }, 1200);
+                        setTimeout(() => { secciones[i].style.background = ""; }, 1000);
                         break;
                     }
                 }
@@ -557,17 +617,8 @@
             document.getElementById("showAllZipsBtn").classList.add("active");
         });
         
-        setTimeout(() => {
-            map.openPopup(
-                `<div style="text-align:center;"><strong>🚗 Navegación para Conductores</strong><br>${ciudades.reduce((s,c)=>s+c.zips.length,0)} destinos disponibles<br>Toque cualquier código postal para comenzar la ruta</div>`,
-                [28.2, -81.0],
-                { closeButton: true, autoPan: false }
-            );
-            setTimeout(() => map.closePopup(), 5000);
-        }, 1000);
-        
-        setTimeout(() => map.invalidateSize(), 500);
-        setTimeout(() => map.invalidateSize(), 1500);
+        setTimeout(() => map.invalidateSize(), 200);
+        setTimeout(() => map.invalidateSize(), 800);
     })();
 </script>
 </body>
