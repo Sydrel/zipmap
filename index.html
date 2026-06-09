@@ -3,68 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Ruta entre Códigos ZIP de Florida | Punto A a Punto B</title>
+    <title>ZIP Codes Florida | Territorios y Rutas - Optimizado</title>
     <!-- Leaflet CSS + JS -->
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://tile.openstreetmap.org">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Leaflet Routing Machine -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
-    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html, body { height: 100%; overflow: hidden; }
-        body { font-family: system-ui, 'Segoe UI', sans-serif; background: #eef2f7; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; background: #eef2f7; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
         .header { background: linear-gradient(135deg, #0b3b2f, #1a5c6e); color: white; padding: 0.5rem 1rem; flex-shrink: 0; }
         .header h1 { font-size: 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
-        .route-controls { background: rgba(0,0,0,0.85); padding: 0.5rem; border-radius: 16px; margin-top: 4px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
-        .route-selectors { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-        .route-selectors select, .route-selectors button { padding: 0.3rem 0.6rem; border-radius: 20px; border: none; font-size: 0.7rem; font-weight: 500; cursor: pointer; }
-        .route-selectors select { background: white; color: #1a2c3e; min-width: 140px; }
-        .route-selectors button { background: #f39c12; color: #1e2a3e; transition: all 0.2s; }
-        .route-selectors button:hover { background: #e67e22; transform: scale(1.02); }
-        .route-info { background: #2c3e2f; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.65rem; font-weight: bold; display: flex; gap: 12px; flex-wrap: wrap; }
+        
+        .route-controls { background: rgba(0,0,0,0.85); padding: 0.4rem; border-radius: 16px; margin-top: 4px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: space-between; }
+        .route-selectors { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+        .route-selectors select, .route-selectors button { padding: 0.25rem 0.5rem; border-radius: 20px; border: none; font-size: 0.65rem; font-weight: 500; cursor: pointer; background: white; }
+        .route-selectors button { background: #f39c12; color: #1e2a3e; transition: 0.1s; }
+        .route-selectors button:active { transform: scale(0.97); }
+        .clear-btn { background: #e74c3c !important; color: white !important; }
+        .clear-btn:active { background: #c0392b !important; }
+        .route-info { background: #2c3e2f; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.6rem; font-weight: bold; white-space: nowrap; overflow-x: auto; max-width: 35%; }
         .route-info span { color: #f39c12; }
-        .main-container { display: flex; flex-direction: row; gap: 0.8rem; padding: 0.8rem; flex: 1; min-height: 0; overflow: hidden; }
-        .map-wrapper { flex: 1.5; min-width: 0; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border: 2px solid white; }
+        
+        .main-container { display: flex; flex-direction: row; gap: 0.6rem; padding: 0.6rem; flex: 1; min-height: 0; overflow: hidden; }
+        .map-wrapper { flex: 1.5; min-width: 0; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 2px solid white; }
         #map { width: 100%; height: 100%; background: #cbdae5; }
-        .results-panel { flex: 1; min-width: 0; display: flex; flex-direction: column; background: white; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 2px solid white; overflow: hidden; }
-        .info-card { padding: 0.7rem; display: flex; flex-direction: column; height: 100%; overflow: hidden; }
-        .info-card h3 { font-size: 0.8rem; color: #1e5f55; margin-bottom: 6px; display: flex; justify-content: space-between; }
-        #selectedLocationName { font-size: 0.65rem; color: #c4450c; margin-bottom: 4px; flex-shrink: 0; }
-        #zipCodeList { flex: 1; overflow-y: auto; padding-right: 6px; -webkit-overflow-scrolling: touch; }
-        .city-zip-section { margin-bottom: 0.7rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem; }
-        .city-header { font-weight: 800; font-size: 0.75rem; color: #c4450c; display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
-        .city-color-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
-        .zip-grid { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 3px; }
-        .zip-badge { padding: 0.25rem 0.6rem; border-radius: 40px; font-size: 0.6rem; font-weight: 600; font-family: monospace; cursor: pointer; transition: all 0.15s ease; }
-        .zip-badge:active { transform: scale(0.95); }
-        .instruction { background: #fef9e6; border-radius: 14px; padding: 0.4rem; font-size: 0.55rem; text-align: center; margin-top: 0.5rem; }
-        .drive-instruction { background: #e0f2fe; border-radius: 12px; padding: 4px; font-size: 0.55rem; text-align: center; margin-top: 6px; flex-shrink: 0; }
-        footer { text-align: center; padding: 0.3rem; font-size: 0.5rem; background: #dce5ec; flex-shrink: 0; }
-        #zipCodeList::-webkit-scrollbar { width: 4px; }
+        .results-panel { flex: 1; min-width: 0; display: flex; flex-direction: column; background: white; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 2px solid white; overflow: hidden; }
+        .info-card { padding: 0.5rem; display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+        .info-card h3 { font-size: 0.75rem; color: #1e5f55; margin-bottom: 4px; display: flex; justify-content: space-between; }
+        
+        #zipCodeList { flex: 1; overflow-y: auto; padding-right: 4px; -webkit-overflow-scrolling: touch; }
+        .city-zip-section { margin-bottom: 0.5rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.3rem; }
+        .city-header { font-weight: 800; font-size: 0.7rem; color: #c4450c; display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
+        .city-color-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+        .zip-grid { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 2px; }
+        .zip-badge { padding: 0.2rem 0.5rem; border-radius: 30px; font-size: 0.55rem; font-weight: 600; font-family: monospace; cursor: pointer; transition: all 0.1s ease; background: #f0f4f9; }
+        .zip-badge:active { transform: scale(0.96); background: #e0e7ff; }
+        
+        .instruction { background: #fef9e6; border-radius: 12px; padding: 0.3rem; font-size: 0.5rem; text-align: center; margin-top: 0.3rem; }
+        .drive-instruction { background: #e0f2fe; border-radius: 10px; padding: 3px; font-size: 0.5rem; text-align: center; margin-top: 4px; flex-shrink: 0; }
+        footer { text-align: center; padding: 0.2rem; font-size: 0.45rem; background: #dce5ec; flex-shrink: 0; }
+        
+        #zipCodeList::-webkit-scrollbar { width: 3px; }
         #zipCodeList::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
         #zipCodeList::-webkit-scrollbar-thumb { background: #f39c12; border-radius: 10px; }
-        .route-loading { background: #f39c12; color: #1e2a3e; padding: 0.2rem 0.5rem; border-radius: 20px; font-size: 0.6rem; }
-        @media (max-width: 700px) { .main-container { flex-direction: column; } .map-wrapper { flex: 0 0 45%; min-height: 280px; } .route-selectors { flex-direction: column; align-items: stretch; } .route-info { justify-content: center; } }
+        
+        .selected-zip-info { background: #fef3c7; padding: 0.2rem; border-radius: 10px; margin-top: 4px; font-size: 0.55rem; text-align: center; flex-shrink: 0; }
+        .clear-boundary-btn { background: #e74c3c; color: white; border: none; border-radius: 16px; padding: 0.15rem 0.5rem; font-size: 0.5rem; cursor: pointer; margin-left: 6px; }
+        
+        @media (max-width: 700px) { .main-container { flex-direction: column; gap: 0.4rem; padding: 0.4rem; } .map-wrapper { flex: 0 0 42%; min-height: 240px; } .route-info { max-width: 100%; white-space: normal; font-size: 0.55rem; } .route-selectors { flex-wrap: wrap; } }
+        @media (min-width: 1200px) { .header h1 { font-size: 1.2rem; } .zip-badge { font-size: 0.6rem; padding: 0.2rem 0.55rem; } }
+        
+        .route-loading { display: inline-block; width: 12px; height: 12px; border: 2px solid #f3f3f3; border-top: 2px solid #f39c12; border-radius: 50%; animation: spin 0.6s linear infinite; vertical-align: middle; margin-right: 4px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 <div class="header">
-    <h1><span>🗺️ Ruta entre Códigos ZIP de Florida</span><span style="font-size:0.55rem;">🚗 Punto A → Punto B</span></h1>
+    <h1><span>🗺️ ZIP Codes Florida</span><span style="font-size:0.5rem;">🗺️ Territorios</span></h1>
     <div class="route-controls">
         <div class="route-selectors">
-            <select id="originSelect">
-                <option value="">📍 Origen (Punto A)</option>
-            </select>
-            <select id="destinySelect">
-                <option value="">📍 Destino (Punto B)</option>
-            </select>
-            <button id="calcRouteBtn">🔄 Calcular Ruta</button>
-            <button id="swapBtn">🔄 Intercambiar</button>
+            <select id="originSelect"><option value="">📍 Origen A</option></select>
+            <select id="destinySelect"><option value="">📍 Destino B</option></select>
+            <button id="calcRouteBtn">🚗 Ruta</button>
+            <button id="swapBtn">🔄 Swap</button>
+            <button id="clearAllBtn" class="clear-btn">🗑️ Limpiar todo</button>
         </div>
-        <div class="route-info" id="routeInfo">
-            🚗 Selecciona origen y destino
-        </div>
+        <div class="route-info" id="routeInfo">🚗 Selecciona A y B</div>
     </div>
 </div>
 
@@ -72,318 +79,285 @@
     <div class="map-wrapper"><div id="map"></div></div>
     <div class="results-panel">
         <div class="info-card">
-            <h3><span>📮 Códigos ZIP</span><span>🎨 Toque uno para usarlo</span></h3>
-            <div id="selectedLocationName">✨ Toque cualquier código → usarlo como origen o destino</div>
-            <div id="zipCodeList"><div class="instruction">⏳ Cargando códigos ZIP...</div></div>
-            <div class="drive-instruction">
-                🚗 <strong>Toque un código</strong> → se añade como origen/destino | Luego presione "Calcular Ruta"
-            </div>
+            <h3><span>📮 Códigos ZIP</span><span>🗺️ Toque → Territorio</span></h3>
+            <div id="zipCodeList"><div class="instruction">⏳ Cargando...</div></div>
+            <div id="selectedZipInfo" class="selected-zip-info">💡 Toque un ZIP para ver su territorio</div>
+            <div class="drive-instruction">🚗 Toque un ZIP → territorio | También como origen/destino</div>
         </div>
     </div>
 </div>
-<footer>📬 Seleccione origen (A) y destino (B) → Mapa muestra la ruta, distancia y tiempo estimado de viaje</footer>
+<footer>📬 Cada ZIP tiene su TERRITORIO (límite postal) | Botón "Limpiar todo" elimina ruta y territorio</footer>
 
 <script>
 (function() {
-    // ========== INICIALIZAR MAPA ==========
-    const map = L.map('map').setView([28.2, -81.4], 7.5);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
-        maxZoom: 18
-    }).addTo(map);
+    // ========== CONFIGURACIÓN INICIAL ==========
+    const map = L.map('map', { preferCanvas: true }).setView([28.2, -81.4], 7.5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OSM', maxZoom: 18 }).addTo(map);
     L.control.scale({ metric: true, imperial: true, position: 'bottomleft' }).addTo(map);
     
-    let currentRoutingControl = null;
-    let currentOriginMarker = null;
-    let currentDestinyMarker = null;
-    let selectedOrigin = null;
-    let selectedDestiny = null;
+    // Variables
+    let currentRouteLayer = null, currentOriginMarker = null, currentDestinyMarker = null;
+    let selectedOrigin = null, selectedDestiny = null, currentBoundaryLayer = null;
+    let currentSelectedZip = null;
+    const zipMarkers = [];
     
-    // Función para actualizar los selects con nombres de ZIP
-    function updateSelects() {
-        const originSelect = document.getElementById('originSelect');
-        const destinySelect = document.getElementById('destinySelect');
-        if (!originSelect || !destinySelect) return;
-        
-        let allZipsOptions = '<option value="">📍 Seleccionar origen (A)</option>';
-        let allDestOptions = '<option value="">📍 Seleccionar destino (B)</option>';
-        
-        ciudades.forEach(ciudad => {
-            ciudad.zips.forEach(zipInfo => {
-                allZipsOptions += `<option value="${zipInfo.zip}|${zipInfo.lat}|${zipInfo.lng}|${ciudad.nombre}">🚗 ${zipInfo.zip} - ${ciudad.nombre}</option>`;
-                allDestOptions += `<option value="${zipInfo.zip}|${zipInfo.lat}|${zipInfo.lng}|${ciudad.nombre}">🚗 ${zipInfo.zip} - ${ciudad.nombre}</option>`;
-            });
-        });
-        originSelect.innerHTML = allZipsOptions;
-        destinySelect.innerHTML = allDestOptions;
+    // Colores por área
+    const colores = { "352": "#E67E22", "904": "#2C7DA0", "321": "#2ECC71", "772": "#E74C3C", "772/561": "#9B59B6" };
+    
+    // ========== TERRITORIOS (POLÍGONOS) ==========
+    const territorios = {
+        "34470": [[29.22,-82.18],[29.22,-82.10],[29.15,-82.10],[29.15,-82.18]],
+        "34471": [[29.21,-82.16],[29.21,-82.12],[29.17,-82.12],[29.17,-82.16]],
+        "34472": [[29.20,-82.14],[29.20,-82.08],[29.14,-82.08],[29.14,-82.14]],
+        "34474": [[29.22,-82.19],[29.22,-82.14],[29.18,-82.14],[29.18,-82.19]],
+        "32202": [[30.36,-81.68],[30.36,-81.63],[30.30,-81.63],[30.30,-81.68]],
+        "32204": [[30.35,-81.69],[30.35,-81.66],[30.32,-81.66],[30.32,-81.69]],
+        "32207": [[30.33,-81.66],[30.33,-81.62],[30.29,-81.62],[30.29,-81.66]],
+        "32209": [[30.39,-81.70],[30.39,-81.66],[30.35,-81.66],[30.35,-81.70]],
+        "32901": [[28.12,-80.64],[28.12,-80.58],[28.05,-80.58],[28.05,-80.64]],
+        "32931": [[28.35,-80.63],[28.35,-80.59],[28.29,-80.59],[28.29,-80.63]],
+        "32960": [[27.67,-80.43],[27.67,-80.37],[27.61,-80.37],[27.61,-80.43]],
+        "34952": [[27.30,-80.39],[27.30,-80.34],[27.25,-80.34],[27.25,-80.39]],
+        "34994": [[27.22,-80.28],[27.22,-80.23],[27.17,-80.23],[27.17,-80.28]],
+        "33455": [[27.09,-80.17],[27.09,-80.12],[27.04,-80.12],[27.04,-80.17]]
+    };
+    
+    function obtenerTerritorio(zip, lat, lng) {
+        if (territorios[zip]) return territorios[zip];
+        const off = 0.045;
+        return [[lat+off, lng-off], [lat+off, lng+off], [lat-off, lng+off], [lat-off, lng-off]];
     }
     
-    // Función para calcular y dibujar ruta USANDO OSRM (más confiable)
-    function calcularRuta(originLat, originLng, destinyLat, destinyLng, originZip, destinyZip) {
-        // Limpiar ruta anterior
-        if (currentRoutingControl) {
-            map.removeControl(currentRoutingControl);
-            currentRoutingControl = null;
-        }
+    function limpiarTerritorio() {
+        if (currentBoundaryLayer) { map.removeLayer(currentBoundaryLayer); currentBoundaryLayer = null; }
+        currentSelectedZip = null;
+    }
+    
+    function mostrarTerritorio(zipInfo) {
+        limpiarTerritorio();
+        const coords = obtenerTerritorio(zipInfo.zip, zipInfo.lat, zipInfo.lng);
+        currentBoundaryLayer = L.polygon(coords, {
+            color: zipInfo.color, weight: 2.5, fillColor: zipInfo.color, fillOpacity: 0.15, dashArray: '4, 4'
+        }).addTo(map);
+        currentBoundaryLayer.bindPopup(`<b>📬 ${zipInfo.zip}</b><br>📍 ${zipInfo.city}<br>🗺️ TERRITORIO POSTAL`);
+        currentSelectedZip = zipInfo;
+        document.getElementById('selectedZipInfo').innerHTML = `📍 <strong>${zipInfo.zip}</strong> - ${zipInfo.city}<br>🗺️ Territorio visible<br><button id="clearBtn" style="background:#e74c3c; color:white; border:none; border-radius:12px; padding:0.1rem 0.5rem; font-size:0.5rem; margin-top:2px;">🗑️ Ocultar territorio</button>`;
+        const btn = document.getElementById('clearBtn');
+        if (btn) btn.onclick = () => { limpiarTerritorio(); document.getElementById('selectedZipInfo').innerHTML = '💡 Territorio ocultado - Toque otro ZIP'; };
+        map.fitBounds(currentBoundaryLayer.getBounds(), { padding: [30, 30] });
+        currentBoundaryLayer.openPopup();
+    }
+    
+    // ========== FUNCIÓN LIMPIAR TODO ==========
+    function limpiarTodo() {
+        // Limpiar ruta
+        if (currentRouteLayer) { map.removeLayer(currentRouteLayer); currentRouteLayer = null; }
+        if (currentOriginMarker) { map.removeLayer(currentOriginMarker); currentOriginMarker = null; }
+        if (currentDestinyMarker) { map.removeLayer(currentDestinyMarker); currentDestinyMarker = null; }
         
-        // Eliminar marcadores anteriores
+        // Limpiar territorio
+        limpiarTerritorio();
+        
+        // Limpiar selecciones
+        selectedOrigin = null;
+        selectedDestiny = null;
+        
+        // Limpiar selects
+        document.getElementById('originSelect').value = '';
+        document.getElementById('destinySelect').value = '';
+        
+        // Limpiar información
+        document.getElementById('routeInfo').innerHTML = '🚗 Todo limpiado - Selecciona A y B';
+        document.getElementById('selectedZipInfo').innerHTML = '💡 Todo limpiado - Toque un ZIP para ver su territorio';
+        
+        // Volver a vista normal de Florida
+        map.setView([28.2, -81.4], 7.5);
+        
+        // Notificación rápida
+        const toast = document.createElement('div');
+        toast.textContent = '🗑️ Todo limpiado: ruta, territorio y selecciones';
+        toast.style.cssText = 'position:fixed; bottom:60px; left:50%; transform:translateX(-50%); background:#2c3e2f; color:white; padding:4px 12px; border-radius:20px; font-size:0.6rem; z-index:2000; pointer-events:none; opacity:0.9;';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
+    }
+    
+    // ========== DATOS (compactos) ==========
+    const ciudades = [
+        { n: "Ocala", ac: "352", c: "#E67E22", z: [
+            { z: "34470", lt: 29.1872, ln: -82.1401 }, { z: "34471", lt: 29.1800, ln: -82.1300 },
+            { z: "34472", lt: 29.1700, ln: -82.1000 }, { z: "34474", lt: 29.1950, ln: -82.1500 },
+            { z: "34475", lt: 29.2100, ln: -82.1600 }, { z: "34476", lt: 29.1600, ln: -82.1200 }
+        ]},
+        { n: "Jacksonville", ac: "904", c: "#2C7DA0", z: [
+            { z: "32202", lt: 30.3322, ln: -81.6557 }, { z: "32204", lt: 30.3400, ln: -81.6700 },
+            { z: "32207", lt: 30.3100, ln: -81.6300 }, { z: "32209", lt: 30.3600, ln: -81.6900 },
+            { z: "32210", lt: 30.2700, ln: -81.7200 }, { z: "32216", lt: 30.2600, ln: -81.5500 }
+        ]},
+        { n: "Space Coast", ac: "321", c: "#2ECC71", z: [
+            { z: "32901", lt: 28.0836, ln: -80.6081 }, { z: "32931", lt: 28.3200, ln: -80.6075 },
+            { z: "32934", lt: 28.1400, ln: -80.6900 }, { z: "32935", lt: 28.1500, ln: -80.6400 },
+            { z: "32905", lt: 28.0345, ln: -80.5887 }, { z: "32907", lt: 28.0200, ln: -80.6000 }
+        ]},
+        { n: "Treasure Coast", ac: "772", c: "#E74C3C", z: [
+            { z: "32960", lt: 27.6386, ln: -80.3973 }, { z: "34945", lt: 27.4600, ln: -80.3700 },
+            { z: "34952", lt: 27.2730, ln: -80.3582 }, { z: "34953", lt: 27.2500, ln: -80.3800 },
+            { z: "34983", lt: 27.2900, ln: -80.3900 }, { z: "34994", lt: 27.1975, ln: -80.2528 }
+        ]},
+        { n: "Stuart/Hobe", ac: "772/561", c: "#9B59B6", z: [
+            { z: "34996", lt: 27.2100, ln: -80.2300 }, { z: "33455", lt: 27.0595, ln: -80.1366 },
+            { z: "33475", lt: 27.0400, ln: -80.1200 }, { z: "34990", lt: 27.1400, ln: -80.2000 }
+        ]}
+    ];
+    
+    const allZips = [];
+    for (const city of ciudades) {
+        for (const zip of city.z) {
+            allZips.push({ zip: zip.z, lat: zip.lt, lng: zip.ln, city: city.n, color: city.c, areaCode: city.ac });
+        }
+    }
+    
+    // ========== RUTA (con cache) ==========
+    let routeCache = new Map();
+    
+    async function calcularRuta(orLat, orLng, destLat, destLng, orZip, destZip) {
+        if (currentRouteLayer) map.removeLayer(currentRouteLayer);
         if (currentOriginMarker) map.removeLayer(currentOriginMarker);
         if (currentDestinyMarker) map.removeLayer(currentDestinyMarker);
         
-        // Crear marcadores personalizados
-        const originIcon = L.divIcon({ 
-            html: `<div style="background-color:#2ECC71; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; font-weight: bold; font-size: 9px; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">A<br>${originZip}</div>`, 
-            iconSize: [34,34],
-            popupAnchor: [0, -15]
-        });
+        const cacheKey = `${orLat},${orLng}|${destLat},${destLng}`;
+        const originIcon = L.divIcon({ html: `<div style="background:#2ECC71; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid white; font-size:8px; font-weight:bold;">A<br>${orZip}</div>`, iconSize: [30,30] });
+        const destinyIcon = L.divIcon({ html: `<div style="background:#E74C3C; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid white; font-size:8px; font-weight:bold;">B<br>${destZip}</div>`, iconSize: [30,30] });
         
-        const destinyIcon = L.divIcon({ 
-            html: `<div style="background-color:#E74C3C; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; font-weight: bold; font-size: 9px; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">B<br>${destinyZip}</div>`, 
-            iconSize: [34,34],
-            popupAnchor: [0, -15]
-        });
+        currentOriginMarker = L.marker([orLat, orLng], { icon: originIcon }).addTo(map);
+        currentDestinyMarker = L.marker([destLat, destLng], { icon: destinyIcon }).addTo(map);
         
-        currentOriginMarker = L.marker([originLat, originLng], { icon: originIcon }).addTo(map);
-        currentDestinyMarker = L.marker([destinyLat, destinyLng], { icon: destinyIcon }).addTo(map);
+        const routeDiv = document.getElementById('routeInfo');
+        routeDiv.innerHTML = `<span class="route-loading"></span> Calculando...`;
         
-        currentOriginMarker.bindPopup(`<b>🚗 ORIGEN (A)</b><br>📬 ZIP: ${originZip}<br>📍 ${originLat.toFixed(4)}, ${originLng.toFixed(4)}`).openPopup();
-        currentDestinyMarker.bindPopup(`<b>🏁 DESTINO (B)</b><br>📬 ZIP: ${destinyZip}<br>📍 ${destinyLat.toFixed(4)}, ${destinyLng.toFixed(4)}`);
-        
-        // Mostrar loading en la interfaz
-        document.getElementById('routeInfo').innerHTML = `<span class="route-loading">⏳ Calculando ruta entre ${originZip} y ${destinyZip}...</span>`;
-        
-        // Usar OSRM con servicio público (gratuito y confiable)
-        // Formato correcto: lng,lat para OSRM
-        const waypoints = `${originLng},${originLat};${destinyLng},${destinyLat}`;
-        const url = `https://router.project-osrm.org/route/v1/driving/${waypoints}?overview=full&geometries=geojson&steps=true`;
-        
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
-                    const route = data.routes[0];
-                    const distanceKm = (route.distance / 1000).toFixed(1);
-                    const durationMin = Math.round(route.duration / 60);
-                    const hours = Math.floor(durationMin / 60);
-                    const minutes = durationMin % 60;
-                    let tiempoTexto = '';
-                    if (hours > 0) {
-                        tiempoTexto = `${hours} hora${hours !== 1 ? 's' : ''} ${minutes} min`;
-                    } else {
-                        tiempoTexto = `${minutes} minutos`;
-                    }
-                    
-                    // Dibujar la ruta en el mapa
-                    const geojson = route.geometry;
-                    const routeLayer = L.geoJSON(geojson, {
-                        style: { color: '#f39c12', weight: 6, opacity: 0.9 }
-                    }).addTo(map);
-                    
-                    // Guardar referencia para limpiar después
-                    if (currentRoutingControl) {
-                        // Si hay una ruta anterior, la removemos
-                        if (currentRoutingControl.getPlan) {
-                            map.removeControl(currentRoutingControl);
-                        }
-                    }
-                    currentRoutingControl = routeLayer;
-                    
-                    // Actualizar información
-                    document.getElementById('routeInfo').innerHTML = `🚗 <span>${originZip}</span> → <span>${destinyZip}</span> | 📏 ${distanceKm} km | ⏱️ ${tiempoTexto}`;
-                    
-                    // Ajustar el mapa para mostrar toda la ruta
-                    const bounds = L.geoJSON(geojson).getBounds();
-                    map.fitBounds(bounds, { padding: [50, 50] });
-                    
-                } else {
-                    document.getElementById('routeInfo').innerHTML = `❌ Error: No se encontró ruta entre ${originZip} y ${destinyZip}`;
-                }
-            })
-            .catch(error => {
-                console.error('Error al calcular ruta:', error);
-                document.getElementById('routeInfo').innerHTML = `❌ Error de conexión. Intente nuevamente.`;
-            });
+        try {
+            let data = routeCache.get(cacheKey);
+            if (!data) {
+                const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${orLng},${orLat};${destLng},${destLat}?overview=full&geometries=geojson`);
+                data = await res.json();
+                if (data.code === 'Ok') routeCache.set(cacheKey, data);
+            }
+            if (data && data.code === 'Ok' && data.routes.length) {
+                const route = data.routes[0];
+                const dist = (route.distance / 1000).toFixed(1);
+                const mins = Math.round(route.duration / 60);
+                const hours = Math.floor(mins / 60);
+                const time = hours > 0 ? `${hours}h ${mins % 60}min` : `${mins}min`;
+                currentRouteLayer = L.geoJSON(route.geometry, { style: { color: '#f39c12', weight: 5 } }).addTo(map);
+                routeDiv.innerHTML = `🚗 <span>${orZip}</span> → <span>${destZip}</span> | 📏 ${dist} km | ⏱️ ${time}`;
+                map.fitBounds(currentRouteLayer.getBounds(), { padding: [40, 40] });
+            } else routeDiv.innerHTML = `❌ Ruta no disponible`;
+        } catch(e) { routeDiv.innerHTML = `❌ Error`; }
     }
     
-    // Función para intercambiar origen/destino
     function swapRoute() {
         if (selectedOrigin && selectedDestiny) {
-            const temp = selectedOrigin;
-            selectedOrigin = selectedDestiny;
-            selectedDestiny = temp;
-            // Actualizar selects
+            [selectedOrigin, selectedDestiny] = [selectedDestiny, selectedOrigin];
             document.getElementById('originSelect').value = `${selectedOrigin.zip}|${selectedOrigin.lat}|${selectedOrigin.lng}|${selectedOrigin.city}`;
             document.getElementById('destinySelect').value = `${selectedDestiny.zip}|${selectedDestiny.lat}|${selectedDestiny.lng}|${selectedDestiny.city}`;
             calcularRuta(selectedOrigin.lat, selectedOrigin.lng, selectedDestiny.lat, selectedDestiny.lng, selectedOrigin.zip, selectedDestiny.zip);
-            
-            const toast = document.createElement('div');
-            toast.innerText = `🔄 Ruta intercambiada: ${selectedOrigin.zip} ↔ ${selectedDestiny.zip}`;
-            toast.style.cssText = 'position:fixed; bottom:15px; left:15px; background:#f39c12; color:white; padding:4px 10px; border-radius:20px; font-size:0.65rem; z-index:2000;';
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 2000);
-        } else {
-            alert('⚠️ Selecciona primero Origen y Destino');
-        }
+        } else alert('⚠️ Selecciona Origen y Destino');
     }
     
-    // ========== BASE DE DATOS COMPLETA ==========
-    const ciudades = [
-        { nombre: "Ocala", areaCode: "352", color: "#E67E22", zips: [
-            { zip: "34470", lat: 29.1872, lng: -82.1401 }, { zip: "34471", lat: 29.1800, lng: -82.1300 },
-            { zip: "34472", lat: 29.1700, lng: -82.1000 }, { zip: "34474", lat: 29.1950, lng: -82.1500 },
-            { zip: "34475", lat: 29.2100, lng: -82.1600 }, { zip: "34476", lat: 29.1600, lng: -82.1200 },
-            { zip: "34478", lat: 29.1870, lng: -82.1400 }, { zip: "34479", lat: 29.2000, lng: -82.1300 },
-            { zip: "34480", lat: 29.1500, lng: -82.0900 }, { zip: "34481", lat: 29.2200, lng: -82.1800 },
-            { zip: "34482", lat: 29.2300, lng: -82.1900 }, { zip: "34483", lat: 29.2400, lng: -82.2000 }
-        ] },
-        { nombre: "Jacksonville", areaCode: "904", color: "#2C7DA0", zips: [
-            { zip: "32202", lat: 30.3322, lng: -81.6557 }, { zip: "32204", lat: 30.3400, lng: -81.6700 },
-            { zip: "32205", lat: 30.3000, lng: -81.7000 }, { zip: "32206", lat: 30.3500, lng: -81.6400 },
-            { zip: "32207", lat: 30.3100, lng: -81.6300 }, { zip: "32208", lat: 30.3800, lng: -81.6800 },
-            { zip: "32209", lat: 30.3600, lng: -81.6900 }, { zip: "32210", lat: 30.2700, lng: -81.7200 },
-            { zip: "32211", lat: 30.3300, lng: -81.6000 }, { zip: "32216", lat: 30.2600, lng: -81.5500 },
-            { zip: "32217", lat: 30.2400, lng: -81.6200 }, { zip: "32218", lat: 30.4500, lng: -81.6500 },
-            { zip: "32219", lat: 30.4700, lng: -81.6800 }, { zip: "32220", lat: 30.4000, lng: -81.7800 },
-            { zip: "32221", lat: 30.2900, lng: -81.7800 }, { zip: "32222", lat: 30.2200, lng: -81.7600 },
-            { zip: "32223", lat: 30.1500, lng: -81.6500 }, { zip: "32224", lat: 30.2900, lng: -81.4500 },
-            { zip: "32225", lat: 30.3800, lng: -81.5200 }, { zip: "32226", lat: 30.4800, lng: -81.5300 },
-            { zip: "32244", lat: 30.1900, lng: -81.7200 }, { zip: "32246", lat: 30.2900, lng: -81.4900 },
-            { zip: "32250", lat: 30.2600, lng: -81.4100 }, { zip: "32254", lat: 30.3400, lng: -81.7100 },
-            { zip: "32256", lat: 30.2000, lng: -81.5200 }, { zip: "32257", lat: 30.2000, lng: -81.6200 },
-            { zip: "32258", lat: 30.1200, lng: -81.5800 }, { zip: "32259", lat: 30.0800, lng: -81.6200 }
-        ] },
-        { nombre: "Melbourne", areaCode: "321", color: "#2ECC71", zips: [
-            { zip: "32901", lat: 28.0836, lng: -80.6081 }, { zip: "32904", lat: 28.0700, lng: -80.6300 },
-            { zip: "32934", lat: 28.1400, lng: -80.6900 }, { zip: "32935", lat: 28.1500, lng: -80.6400 },
-            { zip: "32940", lat: 28.2300, lng: -80.7100 }
-        ] },
-        { nombre: "Cocoa Beach", areaCode: "321", color: "#2ECC71", zips: [
-            { zip: "32931", lat: 28.3200, lng: -80.6075 }, { zip: "32932", lat: 28.3300, lng: -80.6100 }
-        ] },
-        { nombre: "Palm Bay", areaCode: "321", color: "#2ECC71", zips: [
-            { zip: "32905", lat: 28.0345, lng: -80.5887 }, { zip: "32907", lat: 28.0200, lng: -80.6000 },
-            { zip: "32908", lat: 27.9900, lng: -80.6200 }, { zip: "32909", lat: 27.9600, lng: -80.5800 }
-        ] },
-        { nombre: "Vero Beach", areaCode: "772", color: "#E74C3C", zips: [
-            { zip: "32960", lat: 27.6386, lng: -80.3973 }, { zip: "32962", lat: 27.6200, lng: -80.4200 },
-            { zip: "32963", lat: 27.6800, lng: -80.3700 }, { zip: "32964", lat: 27.6500, lng: -80.4000 },
-            { zip: "32966", lat: 27.6700, lng: -80.4400 }, { zip: "32967", lat: 27.7000, lng: -80.4600 },
-            { zip: "32968", lat: 27.6000, lng: -80.4400 }
-        ] },
-        { nombre: "Fort Pierce", areaCode: "772", color: "#E74C3C", zips: [
-            { zip: "34945", lat: 27.4600, lng: -80.3700 }, { zip: "34946", lat: 27.4500, lng: -80.3300 },
-            { zip: "34947", lat: 27.4400, lng: -80.3400 }, { zip: "34950", lat: 27.4467, lng: -80.3256 },
-            { zip: "34951", lat: 27.4800, lng: -80.3500 }
-        ] },
-        { nombre: "Port St. Lucie", areaCode: "772", color: "#E74C3C", zips: [
-            { zip: "34952", lat: 27.2730, lng: -80.3582 }, { zip: "34953", lat: 27.2500, lng: -80.3800 },
-            { zip: "34983", lat: 27.2900, lng: -80.3900 }, { zip: "34984", lat: 27.3100, lng: -80.3800 },
-            { zip: "34985", lat: 27.3000, lng: -80.3600 }, { zip: "34986", lat: 27.3200, lng: -80.4100 },
-            { zip: "34987", lat: 27.1500, lng: -80.3700 }, { zip: "34988", lat: 27.2100, lng: -80.3500 }
-        ] },
-        { nombre: "Stuart", areaCode: "772", color: "#E74C3C", zips: [
-            { zip: "34994", lat: 27.1975, lng: -80.2528 }, { zip: "34995", lat: 27.1900, lng: -80.2500 },
-            { zip: "34996", lat: 27.2100, lng: -80.2300 }, { zip: "34997", lat: 27.1800, lng: -80.2100 }
-        ] },
-        { nombre: "Hobe Sound", areaCode: "772 / 561", color: "#9B59B6", zips: [
-            { zip: "33455", lat: 27.0595, lng: -80.1366 }, { zip: "33475", lat: 27.0400, lng: -80.1200 },
-            { zip: "34990", lat: 27.1400, lng: -80.2000 }, { zip: "34998", lat: 27.1600, lng: -80.1800 }
-        ] }
-    ];
+    // ========== UI ==========
+    function updateSelects() {
+        const originSel = document.getElementById('originSelect');
+        const destSel = document.getElementById('destinySelect');
+        let opts = '<option value="">📍 Origen A</option>', optsD = '<option value="">📍 Destino B</option>';
+        for (const z of allZips) {
+            opts += `<option value="${z.zip}|${z.lat}|${z.lng}|${z.city}">🚗 ${z.zip} - ${z.city}</option>`;
+            optsD += `<option value="${z.zip}|${z.lat}|${z.lng}|${z.city}">🚗 ${z.zip} - ${z.city}</option>`;
+        }
+        originSel.innerHTML = opts;
+        destSel.innerHTML = optsD;
+    }
     
-    // Renderizar lista de ZIPs
-    function renderizarZips() {
-        const container = document.getElementById("zipCodeList");
-        container.innerHTML = `<div id="ciudadesContainer"></div>`;
-        const mainDiv = document.getElementById("ciudadesContainer");
-        ciudades.forEach(ciudad => {
-            const section = document.createElement("div"); section.className = "city-zip-section";
-            const zipsOrdenados = [...ciudad.zips].sort((a,b) => a.zip.localeCompare(b.zip));
-            section.innerHTML = `
-                <div class="city-header"><span class="city-color-dot" style="background-color: ${ciudad.color};"></span><span>🏙️ ${ciudad.nombre} (${ciudad.areaCode})</span><span style="font-size:0.55rem;">${zipsOrdenados.length}</span></div>
-                <div class="zip-grid" id="grid-${ciudad.nombre.replace(/\s/g,'')}"></div>
-            `;
-            mainDiv.appendChild(section);
-            const grid = section.querySelector('.zip-grid');
-            zipsOrdenados.forEach(zipInfo => {
-                const badge = document.createElement("div");
-                badge.className = "zip-badge";
-                badge.style.backgroundColor = ciudad.color;
-                badge.style.color = "white";
-                badge.innerText = `🚗 ${zipInfo.zip}`;
-                badge.addEventListener('click', () => {
-                    const useAs = confirm(`Usar ZIP ${zipInfo.zip} (${ciudad.nombre}) como:\n✓ OK = Origen (A)\n✗ Cancelar = Destino (B)`);
-                    if (useAs) {
-                        selectedOrigin = { zip: zipInfo.zip, lat: zipInfo.lat, lng: zipInfo.lng, city: ciudad.nombre };
-                        document.getElementById('originSelect').value = `${zipInfo.zip}|${zipInfo.lat}|${zipInfo.lng}|${ciudad.nombre}`;
-                        document.getElementById('routeInfo').innerHTML = `📍 Origen seleccionado: ${zipInfo.zip} (${ciudad.nombre}) → selecciona destino`;
+    function renderLista() {
+        const container = document.getElementById('zipCodeList');
+        let html = '';
+        for (const city of ciudades) {
+            const sorted = [...city.z].sort((a,b) => a.z.localeCompare(b.z));
+            html += `<div class="city-zip-section"><div class="city-header"><span class="city-color-dot" style="background:${city.c}"></span><span>🏙️ ${city.n} (${city.ac})</span></div><div class="zip-grid">`;
+            for (const zip of sorted) {
+                html += `<div class="zip-badge" style="background:${city.c}; color:white;" data-zip="${zip.z}" data-lat="${zip.lt}" data-lng="${zip.ln}" data-city="${city.n}" data-color="${city.c}">🗺️ ${zip.z}</div>`;
+            }
+            html += `</div></div>`;
+        }
+        container.innerHTML = html + `<div class="instruction">✅ ${allZips.length} códigos ZIP</div>`;
+        
+        container.querySelectorAll('.zip-badge').forEach(el => {
+            el.addEventListener('click', () => {
+                const zip = el.dataset.zip, lat = parseFloat(el.dataset.lat), lng = parseFloat(el.dataset.lng);
+                const city = el.dataset.city, color = el.dataset.color;
+                const zipInfo = { zip, lat, lng, city, color };
+                if (confirm(`📍 ${zip} - ${city}\n\n✓ OK = Ver territorio\n✗ Cancelar = Origen/Destino`)) {
+                    mostrarTerritorio(zipInfo);
+                } else {
+                    if (confirm(`Usar ${zip} como:\n✓ OK = Origen (A)\n✗ Cancelar = Destino (B)`)) {
+                        selectedOrigin = zipInfo;
+                        document.getElementById('originSelect').value = `${zip}|${lat}|${lng}|${city}`;
+                        document.getElementById('routeInfo').innerHTML = `📍 Origen: ${zip}`;
                     } else {
-                        selectedDestiny = { zip: zipInfo.zip, lat: zipInfo.lat, lng: zipInfo.lng, city: ciudad.nombre };
-                        document.getElementById('destinySelect').value = `${zipInfo.zip}|${zipInfo.lat}|${zipInfo.lng}|${ciudad.nombre}`;
-                        document.getElementById('routeInfo').innerHTML = `📍 Destino seleccionado: ${zipInfo.zip} (${ciudad.nombre}) → listo para calcular ruta`;
+                        selectedDestiny = zipInfo;
+                        document.getElementById('destinySelect').value = `${zip}|${lat}|${lng}|${city}`;
+                        document.getElementById('routeInfo').innerHTML = `📍 Destino: ${zip}`;
                     }
-                    if (selectedOrigin && selectedDestiny) {
-                        calcularRuta(selectedOrigin.lat, selectedOrigin.lng, selectedDestiny.lat, selectedDestiny.lng, selectedOrigin.zip, selectedDestiny.zip);
-                    }
-                });
-                grid.appendChild(badge);
+                    if (selectedOrigin && selectedDestiny) calcularRuta(selectedOrigin.lat, selectedOrigin.lng, selectedDestiny.lat, selectedDestiny.lng, selectedOrigin.zip, selectedDestiny.zip);
+                }
             });
         });
     }
     
-    // Eventos de los selects
-    document.getElementById('originSelect')?.addEventListener('change', (e) => {
-        if (e.target.value) {
-            const parts = e.target.value.split('|');
-            selectedOrigin = { zip: parts[0], lat: parseFloat(parts[1]), lng: parseFloat(parts[2]), city: parts[3] };
-            document.getElementById('routeInfo').innerHTML = `📍 Origen: ${selectedOrigin.zip} (${selectedOrigin.city}) → selecciona destino`;
+    function dibujarMarcadores() {
+        for (const zip of allZips) {
+            const icon = L.divIcon({ html: `<div style="background:${zip.color}; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1.5px solid white; font-size:7px; font-weight:bold; color:white;">${zip.zip.slice(-2)}</div>`, iconSize: [22,22] });
+            const marker = L.marker([zip.lat, zip.lng], { icon }).addTo(map);
+            marker.on('click', () => {
+                if (confirm(`📍 ${zip.zip} - ${zip.city}\n\n✓ OK = Ver territorio\n✗ Cancelar = Origen/Destino`)) {
+                    mostrarTerritorio(zip);
+                } else {
+                    if (confirm(`Usar ${zip.zip} como:\n✓ OK = Origen (A)\n✗ Cancelar = Destino (B)`)) {
+                        selectedOrigin = zip;
+                        document.getElementById('originSelect').value = `${zip.zip}|${zip.lat}|${zip.lng}|${zip.city}`;
+                    } else {
+                        selectedDestiny = zip;
+                        document.getElementById('destinySelect').value = `${zip.zip}|${zip.lat}|${zip.lng}|${zip.city}`;
+                    }
+                    if (selectedOrigin && selectedDestiny) calcularRuta(selectedOrigin.lat, selectedOrigin.lng, selectedDestiny.lat, selectedDestiny.lng, selectedOrigin.zip, selectedDestiny.zip);
+                }
+            });
+            zipMarkers.push(marker);
         }
+    }
+    
+    // Event listeners
+    document.getElementById('originSelect')?.addEventListener('change', (e) => {
+        if (e.target.value) { const p = e.target.value.split('|'); selectedOrigin = { zip: p[0], lat: parseFloat(p[1]), lng: parseFloat(p[2]), city: p[3] }; }
     });
     document.getElementById('destinySelect')?.addEventListener('change', (e) => {
-        if (e.target.value) {
-            const parts = e.target.value.split('|');
-            selectedDestiny = { zip: parts[0], lat: parseFloat(parts[1]), lng: parseFloat(parts[2]), city: parts[3] };
-            document.getElementById('routeInfo').innerHTML = `📍 Destino: ${selectedDestiny.zip} (${selectedDestiny.city}) → listo`;
-            if (selectedOrigin && selectedDestiny) {
-                calcularRuta(selectedOrigin.lat, selectedOrigin.lng, selectedDestiny.lat, selectedDestiny.lng, selectedOrigin.zip, selectedDestiny.zip);
-            }
-        }
+        if (e.target.value) { const p = e.target.value.split('|'); selectedDestiny = { zip: p[0], lat: parseFloat(p[1]), lng: parseFloat(p[2]), city: p[3] };
+        if (selectedOrigin && selectedDestiny) calcularRuta(selectedOrigin.lat, selectedOrigin.lng, selectedDestiny.lat, selectedDestiny.lng, selectedOrigin.zip, selectedDestiny.zip); }
     });
     document.getElementById('calcRouteBtn')?.addEventListener('click', () => {
-        if (selectedOrigin && selectedDestiny) {
-            calcularRuta(selectedOrigin.lat, selectedOrigin.lng, selectedDestiny.lat, selectedDestiny.lng, selectedOrigin.zip, selectedDestiny.zip);
-        } else {
-            alert('⚠️ Selecciona primero Origen (A) y Destino (B)');
-        }
+        if (selectedOrigin && selectedDestiny) calcularRuta(selectedOrigin.lat, selectedOrigin.lng, selectedDestiny.lat, selectedDestiny.lng, selectedOrigin.zip, selectedDestiny.zip);
+        else alert('⚠️ Selecciona Origen y Destino');
     });
     document.getElementById('swapBtn')?.addEventListener('click', swapRoute);
+    document.getElementById('clearAllBtn')?.addEventListener('click', limpiarTodo);
     
-    // Marcadores de ciudades en el mapa
-    const coordsCiudades = { 
-        "Ocala":[29.1872,-82.1401], "Jacksonville":[30.3322,-81.6557], "Melbourne":[28.0836,-80.6081],
-        "Cocoa Beach":[28.3200,-80.6075], "Palm Bay":[28.0345,-80.5887], "Vero Beach":[27.6386,-80.3973],
-        "Fort Pierce":[27.4467,-80.3256], "Port St. Lucie":[27.2730,-80.3582], "Stuart":[27.1975,-80.2528],
-        "Hobe Sound":[27.0595,-80.1366]
-    };
-    
-    ciudades.forEach(ciudad => {
-        let coords = coordsCiudades[ciudad.nombre];
-        if (!coords && ciudad.zips.length) coords = [ciudad.zips[0].lat, ciudad.zips[0].lng];
-        if (!coords) return;
-        const icon = L.divIcon({ 
-            html: `<div style="background-color: ${ciudad.color}; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; font-size: 8px; color: white; font-weight: bold;">${ciudad.nombre.substring(0,2)}</div>`, 
-            iconSize: [26,26] 
-        });
-        L.marker(coords, { icon }).addTo(map).bindPopup(`<b>🏙️ ${ciudad.nombre}</b><br>📞 ${ciudad.areaCode}<br>📬 ${ciudad.zips.length} ZIPs`);
-    });
-    
+    // Inicialización
     updateSelects();
-    renderizarZips();
+    dibujarMarcadores();
+    renderLista();
     
-    const resizeMap = () => setTimeout(() => map.invalidateSize(), 100);
-    resizeMap();
-    window.addEventListener('resize', resizeMap);
-    window.addEventListener('orientationchange', resizeMap);
+    const resize = () => setTimeout(() => map.invalidateSize(), 50);
+    resize();
+    window.addEventListener('resize', resize);
+    window.addEventListener('orientationchange', resize);
 })();
 </script>
 </body>
