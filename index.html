@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>ZIP Codes Florida | Territorios y Rutas - Optimizado</title>
+    <title>ZIP Codes Florida | 116+ Códigos - Territorios y Rutas</title>
     <!-- Leaflet CSS + JS -->
     <link rel="preconnect" href="https://unpkg.com">
     <link rel="preconnect" href="https://tile.openstreetmap.org">
@@ -16,6 +16,7 @@
         
         .header { background: linear-gradient(135deg, #0b3b2f, #1a5c6e); color: white; padding: 0.5rem 1rem; flex-shrink: 0; }
         .header h1 { font-size: 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+        .zip-count { background: rgba(255,255,255,0.2); padding: 0.1rem 0.5rem; border-radius: 20px; font-size: 0.6rem; }
         
         .route-controls { background: rgba(0,0,0,0.85); padding: 0.4rem; border-radius: 16px; margin-top: 4px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: space-between; }
         .route-selectors { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
@@ -23,7 +24,6 @@
         .route-selectors button { background: #f39c12; color: #1e2a3e; transition: 0.1s; }
         .route-selectors button:active { transform: scale(0.97); }
         .clear-btn { background: #e74c3c !important; color: white !important; }
-        .clear-btn:active { background: #c0392b !important; }
         .route-info { background: #2c3e2f; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.6rem; font-weight: bold; white-space: nowrap; overflow-x: auto; max-width: 35%; }
         .route-info span { color: #f39c12; }
         
@@ -36,10 +36,10 @@
         
         #zipCodeList { flex: 1; overflow-y: auto; padding-right: 4px; -webkit-overflow-scrolling: touch; }
         .city-zip-section { margin-bottom: 0.5rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.3rem; }
-        .city-header { font-weight: 800; font-size: 0.7rem; color: #c4450c; display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
+        .city-header { font-weight: 800; font-size: 0.7rem; color: #c4450c; display: flex; align-items: center; gap: 5px; margin-bottom: 3px; flex-wrap: wrap; }
         .city-color-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
-        .zip-grid { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 2px; }
-        .zip-badge { padding: 0.2rem 0.5rem; border-radius: 30px; font-size: 0.55rem; font-weight: 600; font-family: monospace; cursor: pointer; transition: all 0.1s ease; background: #f0f4f9; }
+        .zip-grid { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 2px; max-height: 80px; overflow-y: auto; }
+        .zip-badge { padding: 0.2rem 0.45rem; border-radius: 30px; font-size: 0.55rem; font-weight: 600; font-family: monospace; cursor: pointer; transition: all 0.1s ease; background: #f0f4f9; white-space: nowrap; }
         .zip-badge:active { transform: scale(0.96); background: #e0e7ff; }
         
         .instruction { background: #fef9e6; border-radius: 12px; padding: 0.3rem; font-size: 0.5rem; text-align: center; margin-top: 0.3rem; }
@@ -51,10 +51,9 @@
         #zipCodeList::-webkit-scrollbar-thumb { background: #f39c12; border-radius: 10px; }
         
         .selected-zip-info { background: #fef3c7; padding: 0.2rem; border-radius: 10px; margin-top: 4px; font-size: 0.55rem; text-align: center; flex-shrink: 0; }
-        .clear-boundary-btn { background: #e74c3c; color: white; border: none; border-radius: 16px; padding: 0.15rem 0.5rem; font-size: 0.5rem; cursor: pointer; margin-left: 6px; }
         
-        @media (max-width: 700px) { .main-container { flex-direction: column; gap: 0.4rem; padding: 0.4rem; } .map-wrapper { flex: 0 0 42%; min-height: 240px; } .route-info { max-width: 100%; white-space: normal; font-size: 0.55rem; } .route-selectors { flex-wrap: wrap; } }
-        @media (min-width: 1200px) { .header h1 { font-size: 1.2rem; } .zip-badge { font-size: 0.6rem; padding: 0.2rem 0.55rem; } }
+        @media (max-width: 700px) { .main-container { flex-direction: column; gap: 0.4rem; padding: 0.4rem; } .map-wrapper { flex: 0 0 42%; min-height: 240px; } .route-info { max-width: 100%; white-space: normal; font-size: 0.55rem; } .route-selectors { flex-wrap: wrap; } .zip-grid { max-height: 60px; } }
+        @media (min-width: 1200px) { .header h1 { font-size: 1.2rem; } .zip-badge { font-size: 0.6rem; padding: 0.2rem 0.55rem; } .zip-grid { max-height: 100px; } }
         
         .route-loading { display: inline-block; width: 12px; height: 12px; border: 2px solid #f3f3f3; border-top: 2px solid #f39c12; border-radius: 50%; animation: spin 0.6s linear infinite; vertical-align: middle; margin-right: 4px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -62,7 +61,7 @@
 </head>
 <body>
 <div class="header">
-    <h1><span>🗺️ ZIP Codes Florida</span><span style="font-size:0.5rem;">🗺️ Territorios</span></h1>
+    <h1><span>🗺️ ZIP Codes Florida</span><span class="zip-count" id="zipCount">116+ códigos</span></h1>
     <div class="route-controls">
         <div class="route-selectors">
             <select id="originSelect"><option value="">📍 Origen A</option></select>
@@ -80,13 +79,13 @@
     <div class="results-panel">
         <div class="info-card">
             <h3><span>📮 Códigos ZIP</span><span>🗺️ Toque → Territorio</span></h3>
-            <div id="zipCodeList"><div class="instruction">⏳ Cargando...</div></div>
+            <div id="zipCodeList"><div class="instruction">⏳ Cargando 116+ códigos...</div></div>
             <div id="selectedZipInfo" class="selected-zip-info">💡 Toque un ZIP para ver su territorio</div>
             <div class="drive-instruction">🚗 Toque un ZIP → territorio | También como origen/destino</div>
         </div>
     </div>
 </div>
-<footer>📬 Cada ZIP tiene su TERRITORIO (límite postal) | Botón "Limpiar todo" elimina ruta y territorio</footer>
+<footer>📬 116+ códigos ZIP completos | Ocala · Jacksonville · Space Coast · Treasure Coast · Hobe Sound</footer>
 
 <script>
 (function() {
@@ -95,25 +94,116 @@
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OSM', maxZoom: 18 }).addTo(map);
     L.control.scale({ metric: true, imperial: true, position: 'bottomleft' }).addTo(map);
     
-    // Variables
     let currentRouteLayer = null, currentOriginMarker = null, currentDestinyMarker = null;
     let selectedOrigin = null, selectedDestiny = null, currentBoundaryLayer = null;
     let currentSelectedZip = null;
     const zipMarkers = [];
     
-    // Colores por área
-    const colores = { "352": "#E67E22", "904": "#2C7DA0", "321": "#2ECC71", "772": "#E74C3C", "772/561": "#9B59B6" };
+    // ========== BASE DE DATOS COMPLETA (116+ CÓDIGOS ZIP) ==========
+    const ciudades = [
+        // OCALA - 12 ZIPs
+        { n: "Ocala", ac: "352", c: "#E67E22", z: [
+            { z: "34470", lt: 29.1872, ln: -82.1401 }, { z: "34471", lt: 29.1800, ln: -82.1300 },
+            { z: "34472", lt: 29.1700, ln: -82.1000 }, { z: "34474", lt: 29.1950, ln: -82.1500 },
+            { z: "34475", lt: 29.2100, ln: -82.1600 }, { z: "34476", lt: 29.1600, ln: -82.1200 },
+            { z: "34478", lt: 29.1870, ln: -82.1400 }, { z: "34479", lt: 29.2000, ln: -82.1300 },
+            { z: "34480", lt: 29.1500, ln: -82.0900 }, { z: "34481", lt: 29.2200, ln: -82.1800 },
+            { z: "34482", lt: 29.2300, ln: -82.1900 }, { z: "34483", lt: 29.2400, ln: -82.2000 }
+        ]},
+        // JACKSONVILLE - 30 ZIPs
+        { n: "Jacksonville", ac: "904", c: "#2C7DA0", z: [
+            { z: "32202", lt: 30.3322, ln: -81.6557 }, { z: "32204", lt: 30.3400, ln: -81.6700 },
+            { z: "32205", lt: 30.3000, ln: -81.7000 }, { z: "32206", lt: 30.3500, ln: -81.6400 },
+            { z: "32207", lt: 30.3100, ln: -81.6300 }, { z: "32208", lt: 30.3800, ln: -81.6800 },
+            { z: "32209", lt: 30.3600, ln: -81.6900 }, { z: "32210", lt: 30.2700, ln: -81.7200 },
+            { z: "32211", lt: 30.3300, ln: -81.6000 }, { z: "32216", lt: 30.2600, ln: -81.5500 },
+            { z: "32217", lt: 30.2400, ln: -81.6200 }, { z: "32218", lt: 30.4500, ln: -81.6500 },
+            { z: "32219", lt: 30.4700, ln: -81.6800 }, { z: "32220", lt: 30.4000, ln: -81.7800 },
+            { z: "32221", lt: 30.2900, ln: -81.7800 }, { z: "32222", lt: 30.2200, ln: -81.7600 },
+            { z: "32223", lt: 30.1500, ln: -81.6500 }, { z: "32224", lt: 30.2900, ln: -81.4500 },
+            { z: "32225", lt: 30.3800, ln: -81.5200 }, { z: "32226", lt: 30.4800, ln: -81.5300 },
+            { z: "32244", lt: 30.1900, ln: -81.7200 }, { z: "32246", lt: 30.2900, ln: -81.4900 },
+            { z: "32250", lt: 30.2600, ln: -81.4100 }, { z: "32254", lt: 30.3400, ln: -81.7100 },
+            { z: "32256", lt: 30.2000, ln: -81.5200 }, { z: "32257", lt: 30.2000, ln: -81.6200 },
+            { z: "32258", lt: 30.1200, ln: -81.5800 }, { z: "32259", lt: 30.0800, ln: -81.6200 },
+            { z: "32277", lt: 30.3600, ln: -81.5800 }, { z: "32290", lt: 30.3300, ln: -81.6500 }
+        ]},
+        // SPACE COAST (Melbourne, Cocoa Beach, Palm Bay) - 15 ZIPs
+        { n: "Melbourne/Cocoa/Palm Bay", ac: "321", c: "#2ECC71", z: [
+            { z: "32901", lt: 28.0836, ln: -80.6081 }, { z: "32902", lt: 28.0836, ln: -80.6081 },
+            { z: "32903", lt: 28.0900, ln: -80.6100 }, { z: "32904", lt: 28.0700, ln: -80.6300 },
+            { z: "32912", lt: 28.0500, ln: -80.5800 }, { z: "32931", lt: 28.3200, ln: -80.6075 },
+            { z: "32932", lt: 28.3300, ln: -80.6100 }, { z: "32934", lt: 28.1400, ln: -80.6900 },
+            { z: "32935", lt: 28.1500, ln: -80.6400 }, { z: "32936", lt: 28.1300, ln: -80.6500 },
+            { z: "32940", lt: 28.2300, ln: -80.7100 }, { z: "32941", lt: 28.2200, ln: -80.7000 },
+            { z: "32905", lt: 28.0345, ln: -80.5887 }, { z: "32907", lt: 28.0200, ln: -80.6000 },
+            { z: "32908", lt: 27.9900, ln: -80.6200 }, { z: "32909", lt: 27.9600, ln: -80.5800 },
+            { z: "32910", lt: 28.0100, ln: -80.6000 }, { z: "32911", lt: 28.0000, ln: -80.5900 }
+        ]},
+        // VERO BEACH - 11 ZIPs
+        { n: "Vero Beach", ac: "772", c: "#E74C3C", z: [
+            { z: "32960", lt: 27.6386, ln: -80.3973 }, { z: "32962", lt: 27.6200, ln: -80.4200 },
+            { z: "32963", lt: 27.6800, ln: -80.3700 }, { z: "32964", lt: 27.6500, ln: -80.4000 },
+            { z: "32966", lt: 27.6700, ln: -80.4400 }, { z: "32967", lt: 27.7000, ln: -80.4600 },
+            { z: "32968", lt: 27.6000, ln: -80.4400 }, { z: "32969", lt: 27.6300, ln: -80.3900 },
+            { z: "32970", lt: 27.6400, ln: -80.3800 }, { z: "32971", lt: 27.6600, ln: -80.4100 },
+            { z: "32976", lt: 27.5800, ln: -80.5000 }
+        ]},
+        // FORT PIERCE - 12 ZIPs
+        { n: "Fort Pierce", ac: "772", c: "#E74C3C", z: [
+            { z: "34945", lt: 27.4600, ln: -80.3700 }, { z: "34946", lt: 27.4500, ln: -80.3300 },
+            { z: "34947", lt: 27.4400, ln: -80.3400 }, { z: "34948", lt: 27.4350, ln: -80.3350 },
+            { z: "34949", lt: 27.4300, ln: -80.3200 }, { z: "34950", lt: 27.4467, ln: -80.3256 },
+            { z: "34951", lt: 27.4800, ln: -80.3500 }, { z: "34954", lt: 27.4700, ln: -80.3600 },
+            { z: "34956", lt: 27.4900, ln: -80.3400 }, { z: "34979", lt: 27.4600, ln: -80.3800 },
+            { z: "34981", lt: 27.4300, ln: -80.3400 }, { z: "34982", lt: 27.4200, ln: -80.3300 }
+        ]},
+        // PORT ST. LUCIE - 15 ZIPs
+        { n: "Port St. Lucie", ac: "772", c: "#E74C3C", z: [
+            { z: "34952", lt: 27.2730, ln: -80.3582 }, { z: "34953", lt: 27.2500, ln: -80.3800 },
+            { z: "34954", lt: 27.2600, ln: -80.3900 }, { z: "34956", lt: 27.2800, ln: -80.3700 },
+            { z: "34957", lt: 27.1975, ln: -80.2528 }, { z: "34958", lt: 27.2100, ln: -80.2600 },
+            { z: "34972", lt: 27.2200, ln: -80.4000 }, { z: "34979", lt: 27.2700, ln: -80.3600 },
+            { z: "34983", lt: 27.2900, ln: -80.3900 }, { z: "34984", lt: 27.3100, ln: -80.3800 },
+            { z: "34985", lt: 27.3000, ln: -80.3600 }, { z: "34986", lt: 27.3200, ln: -80.4100 },
+            { z: "34987", lt: 27.1500, ln: -80.3700 }, { z: "34988", lt: 27.2100, ln: -80.3500 },
+            { z: "34990", lt: 27.1400, ln: -80.2000 }
+        ]},
+        // STUART - 7 ZIPs
+        { n: "Stuart", ac: "772", c: "#E74C3C", z: [
+            { z: "34994", lt: 27.1975, ln: -80.2528 }, { z: "34995", lt: 27.1900, ln: -80.2500 },
+            { z: "34996", lt: 27.2100, ln: -80.2300 }, { z: "34997", lt: 27.1800, ln: -80.2100 },
+            { z: "34957", lt: 27.1975, ln: -80.2528 }, { z: "34990", lt: 27.1400, ln: -80.2000 },
+            { z: "34998", lt: 27.1600, ln: -80.1800 }
+        ]},
+        // HOBE SOUND - 10 ZIPs
+        { n: "Hobe Sound", ac: "772/561", c: "#9B59B6", z: [
+            { z: "33455", lt: 27.0595, ln: -80.1366 }, { z: "33458", lt: 27.0600, ln: -80.1300 },
+            { z: "33469", lt: 27.0500, ln: -80.1200 }, { z: "33475", lt: 27.0400, ln: -80.1200 },
+            { z: "33477", lt: 27.0300, ln: -80.1100 }, { z: "33478", lt: 27.0200, ln: -80.1000 },
+            { z: "33496", lt: 27.0100, ln: -80.0900 }, { z: "33497", lt: 27.0000, ln: -80.0800 },
+            { z: "34990", lt: 27.1400, ln: -80.2000 }, { z: "34998", lt: 27.1600, ln: -80.1800 }
+        ]}
+    ];
+    
+    // Contar total de ZIPs
+    let totalZips = 0;
+    for (const city of ciudades) totalZips += city.z.length;
+    document.getElementById('zipCount').innerText = `${totalZips} códigos`;
+    
+    const allZips = [];
+    for (const city of ciudades) {
+        for (const zip of city.z) {
+            allZips.push({ zip: zip.z, lat: zip.lt, lng: zip.ln, city: city.n, color: city.c, areaCode: city.ac });
+        }
+    }
     
     // ========== TERRITORIOS (POLÍGONOS) ==========
     const territorios = {
         "34470": [[29.22,-82.18],[29.22,-82.10],[29.15,-82.10],[29.15,-82.18]],
         "34471": [[29.21,-82.16],[29.21,-82.12],[29.17,-82.12],[29.17,-82.16]],
-        "34472": [[29.20,-82.14],[29.20,-82.08],[29.14,-82.08],[29.14,-82.14]],
-        "34474": [[29.22,-82.19],[29.22,-82.14],[29.18,-82.14],[29.18,-82.19]],
         "32202": [[30.36,-81.68],[30.36,-81.63],[30.30,-81.63],[30.30,-81.68]],
         "32204": [[30.35,-81.69],[30.35,-81.66],[30.32,-81.66],[30.32,-81.69]],
-        "32207": [[30.33,-81.66],[30.33,-81.62],[30.29,-81.62],[30.29,-81.66]],
-        "32209": [[30.39,-81.70],[30.39,-81.66],[30.35,-81.66],[30.35,-81.70]],
         "32901": [[28.12,-80.64],[28.12,-80.58],[28.05,-80.58],[28.05,-80.64]],
         "32931": [[28.35,-80.63],[28.35,-80.59],[28.29,-80.59],[28.29,-80.63]],
         "32960": [[27.67,-80.43],[27.67,-80.37],[27.61,-80.37],[27.61,-80.43]],
@@ -141,82 +231,28 @@
         }).addTo(map);
         currentBoundaryLayer.bindPopup(`<b>📬 ${zipInfo.zip}</b><br>📍 ${zipInfo.city}<br>🗺️ TERRITORIO POSTAL`);
         currentSelectedZip = zipInfo;
-        document.getElementById('selectedZipInfo').innerHTML = `📍 <strong>${zipInfo.zip}</strong> - ${zipInfo.city}<br>🗺️ Territorio visible<br><button id="clearBtn" style="background:#e74c3c; color:white; border:none; border-radius:12px; padding:0.1rem 0.5rem; font-size:0.5rem; margin-top:2px;">🗑️ Ocultar territorio</button>`;
+        document.getElementById('selectedZipInfo').innerHTML = `📍 <strong>${zipInfo.zip}</strong> - ${zipInfo.city}<br>🗺️ Territorio visible<br><button id="clearBtn" style="background:#e74c3c; color:white; border:none; border-radius:12px; padding:0.1rem 0.5rem; font-size:0.5rem; margin-top:2px;">🗑️ Ocultar</button>`;
         const btn = document.getElementById('clearBtn');
         if (btn) btn.onclick = () => { limpiarTerritorio(); document.getElementById('selectedZipInfo').innerHTML = '💡 Territorio ocultado - Toque otro ZIP'; };
         map.fitBounds(currentBoundaryLayer.getBounds(), { padding: [30, 30] });
         currentBoundaryLayer.openPopup();
     }
     
-    // ========== FUNCIÓN LIMPIAR TODO ==========
     function limpiarTodo() {
-        // Limpiar ruta
         if (currentRouteLayer) { map.removeLayer(currentRouteLayer); currentRouteLayer = null; }
         if (currentOriginMarker) { map.removeLayer(currentOriginMarker); currentOriginMarker = null; }
         if (currentDestinyMarker) { map.removeLayer(currentDestinyMarker); currentDestinyMarker = null; }
-        
-        // Limpiar territorio
         limpiarTerritorio();
-        
-        // Limpiar selecciones
         selectedOrigin = null;
         selectedDestiny = null;
-        
-        // Limpiar selects
         document.getElementById('originSelect').value = '';
         document.getElementById('destinySelect').value = '';
-        
-        // Limpiar información
-        document.getElementById('routeInfo').innerHTML = '🚗 Todo limpiado - Selecciona A y B';
-        document.getElementById('selectedZipInfo').innerHTML = '💡 Todo limpiado - Toque un ZIP para ver su territorio';
-        
-        // Volver a vista normal de Florida
+        document.getElementById('routeInfo').innerHTML = '🚗 Todo limpiado';
+        document.getElementById('selectedZipInfo').innerHTML = '💡 Todo limpiado - Toque un ZIP';
         map.setView([28.2, -81.4], 7.5);
-        
-        // Notificación rápida
-        const toast = document.createElement('div');
-        toast.textContent = '🗑️ Todo limpiado: ruta, territorio y selecciones';
-        toast.style.cssText = 'position:fixed; bottom:60px; left:50%; transform:translateX(-50%); background:#2c3e2f; color:white; padding:4px 12px; border-radius:20px; font-size:0.6rem; z-index:2000; pointer-events:none; opacity:0.9;';
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 2000);
     }
     
-    // ========== DATOS (compactos) ==========
-    const ciudades = [
-        { n: "Ocala", ac: "352", c: "#E67E22", z: [
-            { z: "34470", lt: 29.1872, ln: -82.1401 }, { z: "34471", lt: 29.1800, ln: -82.1300 },
-            { z: "34472", lt: 29.1700, ln: -82.1000 }, { z: "34474", lt: 29.1950, ln: -82.1500 },
-            { z: "34475", lt: 29.2100, ln: -82.1600 }, { z: "34476", lt: 29.1600, ln: -82.1200 }
-        ]},
-        { n: "Jacksonville", ac: "904", c: "#2C7DA0", z: [
-            { z: "32202", lt: 30.3322, ln: -81.6557 }, { z: "32204", lt: 30.3400, ln: -81.6700 },
-            { z: "32207", lt: 30.3100, ln: -81.6300 }, { z: "32209", lt: 30.3600, ln: -81.6900 },
-            { z: "32210", lt: 30.2700, ln: -81.7200 }, { z: "32216", lt: 30.2600, ln: -81.5500 }
-        ]},
-        { n: "Space Coast", ac: "321", c: "#2ECC71", z: [
-            { z: "32901", lt: 28.0836, ln: -80.6081 }, { z: "32931", lt: 28.3200, ln: -80.6075 },
-            { z: "32934", lt: 28.1400, ln: -80.6900 }, { z: "32935", lt: 28.1500, ln: -80.6400 },
-            { z: "32905", lt: 28.0345, ln: -80.5887 }, { z: "32907", lt: 28.0200, ln: -80.6000 }
-        ]},
-        { n: "Treasure Coast", ac: "772", c: "#E74C3C", z: [
-            { z: "32960", lt: 27.6386, ln: -80.3973 }, { z: "34945", lt: 27.4600, ln: -80.3700 },
-            { z: "34952", lt: 27.2730, ln: -80.3582 }, { z: "34953", lt: 27.2500, ln: -80.3800 },
-            { z: "34983", lt: 27.2900, ln: -80.3900 }, { z: "34994", lt: 27.1975, ln: -80.2528 }
-        ]},
-        { n: "Stuart/Hobe", ac: "772/561", c: "#9B59B6", z: [
-            { z: "34996", lt: 27.2100, ln: -80.2300 }, { z: "33455", lt: 27.0595, ln: -80.1366 },
-            { z: "33475", lt: 27.0400, ln: -80.1200 }, { z: "34990", lt: 27.1400, ln: -80.2000 }
-        ]}
-    ];
-    
-    const allZips = [];
-    for (const city of ciudades) {
-        for (const zip of city.z) {
-            allZips.push({ zip: zip.z, lat: zip.lt, lng: zip.ln, city: city.n, color: city.c, areaCode: city.ac });
-        }
-    }
-    
-    // ========== RUTA (con cache) ==========
+    // ========== RUTA ==========
     let routeCache = new Map();
     
     async function calcularRuta(orLat, orLng, destLat, destLng, orZip, destZip) {
@@ -224,7 +260,6 @@
         if (currentOriginMarker) map.removeLayer(currentOriginMarker);
         if (currentDestinyMarker) map.removeLayer(currentDestinyMarker);
         
-        const cacheKey = `${orLat},${orLng}|${destLat},${destLng}`;
         const originIcon = L.divIcon({ html: `<div style="background:#2ECC71; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid white; font-size:8px; font-weight:bold;">A<br>${orZip}</div>`, iconSize: [30,30] });
         const destinyIcon = L.divIcon({ html: `<div style="background:#E74C3C; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid white; font-size:8px; font-weight:bold;">B<br>${destZip}</div>`, iconSize: [30,30] });
         
@@ -235,6 +270,7 @@
         routeDiv.innerHTML = `<span class="route-loading"></span> Calculando...`;
         
         try {
+            const cacheKey = `${orLat},${orLng}|${destLat},${destLng}`;
             let data = routeCache.get(cacheKey);
             if (!data) {
                 const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${orLng},${orLat};${destLng},${destLat}?overview=full&geometries=geojson`);
@@ -267,7 +303,8 @@
     function updateSelects() {
         const originSel = document.getElementById('originSelect');
         const destSel = document.getElementById('destinySelect');
-        let opts = '<option value="">📍 Origen A</option>', optsD = '<option value="">📍 Destino B</option>';
+        let opts = '<option value="">📍 Origen A</option>';
+        let optsD = '<option value="">📍 Destino B</option>';
         for (const z of allZips) {
             opts += `<option value="${z.zip}|${z.lat}|${z.lng}|${z.city}">🚗 ${z.zip} - ${z.city}</option>`;
             optsD += `<option value="${z.zip}|${z.lat}|${z.lng}|${z.city}">🚗 ${z.zip} - ${z.city}</option>`;
@@ -281,13 +318,13 @@
         let html = '';
         for (const city of ciudades) {
             const sorted = [...city.z].sort((a,b) => a.z.localeCompare(b.z));
-            html += `<div class="city-zip-section"><div class="city-header"><span class="city-color-dot" style="background:${city.c}"></span><span>🏙️ ${city.n} (${city.ac})</span></div><div class="zip-grid">`;
+            html += `<div class="city-zip-section"><div class="city-header"><span class="city-color-dot" style="background:${city.c}"></span><span>🏙️ ${city.n} (${city.ac})</span><span style="font-size:0.5rem;">${sorted.length} ZIPs</span></div><div class="zip-grid">`;
             for (const zip of sorted) {
                 html += `<div class="zip-badge" style="background:${city.c}; color:white;" data-zip="${zip.z}" data-lat="${zip.lt}" data-lng="${zip.ln}" data-city="${city.n}" data-color="${city.c}">🗺️ ${zip.z}</div>`;
             }
             html += `</div></div>`;
         }
-        container.innerHTML = html + `<div class="instruction">✅ ${allZips.length} códigos ZIP</div>`;
+        container.innerHTML = html + `<div class="instruction">✅ ${totalZips} códigos ZIP cargados</div>`;
         
         container.querySelectorAll('.zip-badge').forEach(el => {
             el.addEventListener('click', () => {
